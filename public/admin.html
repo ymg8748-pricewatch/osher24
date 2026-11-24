@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ניהול · אושר24</title>
+<style>
+:root{--paper:#f2eee3;--ink:#111;--lime:#c9ff2f;--hot:#ff5a1f;--card:#fffdf7;--mute:#6d6a60}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.4 system-ui,Arial,sans-serif}
+.wrap{max-width:780px;margin:0 auto;padding:14px 14px 60px}
+h1{font-size:34px;font-weight:900;letter-spacing:-.05em;margin:6px 0 2px}h1 a{color:inherit;font-size:14px;font-weight:700;letter-spacing:0;margin-inline-start:10px}
+h3{font:700 12px ui-monospace,monospace;letter-spacing:.06em;margin:24px 0 8px;display:flex;gap:8px;align-items:center}h3::after{content:"";flex:1;height:2px;background:var(--ink)}
+.g{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.t{border:2px solid var(--ink);background:var(--card);padding:10px 12px}.t small{display:block;font:700 11px ui-monospace,monospace;color:var(--mute)}.t b{font-size:26px;font-weight:900;letter-spacing:-.04em}
+.t.ok{background:var(--lime)}.t.bad{background:var(--hot);color:#fff}.t.bad small{color:#fff}
+table{width:100%;border-collapse:collapse;background:var(--card);border:2px solid var(--ink)}td,th{padding:6px 10px;text-align:start;border-bottom:1px dashed #b9b4a4}th{font:700 11px ui-monospace,monospace;color:var(--mute)}
+td.n{text-align:end;font-weight:800;width:70px}
+button{border:2px solid var(--ink);background:var(--card);padding:6px 12px;font:700 13px inherit;font-family:inherit;cursor:pointer;margin-top:10px}
+.note{font-size:13px;color:var(--mute);margin-top:8px}
+</style></head><body><div class="wrap">
+<h1>ניהול <a href="/">← לאתר</a></h1><div id="out">טוען...</div></div>
+<script>
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tbl=(title,o,empty)=>{const r=Object.entries(o||{}).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  return `<h3>${title}</h3>`+(r.length?`<table><tr><th>חיפוש</th><th>פעמים</th></tr>${r.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${v}</td></tr>`).join('')}</table>`:`<div class="note">${empty}</div>`)};
+async function load(){
+  const out=document.getElementById('out');
+  const r=await fetch('/api/admin/stats');
+  if(r.status===403){out.innerHTML='<p>הדף הזה זמין רק למנהל רשת. <a href="/logout">התחבר מחדש</a></p>';return}
+  if(!r.ok){out.textContent='שגיאה בטעינה';return}
+  const j=await r.json(),m=j.meta,t=m&&new Date(m.updated_at),h=t?(Date.now()-t)/36e5:null,stale=h!==null&&h>j.staleHours,s=j.stats;
+  let html=`<h3>מצב המערכת</h3><div class="g">
+   <div class="t ${j.dbOk?'ok':'bad'}"><small>מסד נתונים</small><b>${j.dbOk?'תקין':'לא עונה'}</b></div>
+   <div class="t ${stale?'bad':'ok'}"><small>עדכון אחרון</small><b>${t?(h<1?'לפני דקות':h<48?Math.round(h)+' שעות':Math.round(h/24)+' ימים'):'לא ידוע'}</b></div>
+   <div class="t"><small>מוצרים</small><b>${m?Number(m.rows).toLocaleString('he-IL'):'–'}</b></div></div>`;
+  if(!j.kv)html+=`<h3>סטטיסטיקות</h3><div class="note">כדי לראות סטטיסטיקות שימוש והגבלת ניסיונות כניסה צריך לחבר KV namespace בשם KV (ראה README).</div>`;
+  else{
+    const since=new Date(s.since).toLocaleDateString('he-IL');
+    const br=Object.entries(s.byBranch||{}).sort((a,b)=>b[1]-a[1]);
+    html+=`<h3>שימוש מאז ${since}</h3><div class="g">
+     <div class="t"><small>חיפושים</small><b>${s.total}</b></div>
+     <div class="t ${s.noResult/Math.max(1,s.total)>.25?'bad':''}"><small>בלי תוצאה</small><b>${s.noResult}</b></div>
+     <div class="t ${s.errors?'bad':''}"><small>שגיאות מסד</small><b>${s.errors}</b></div></div>`
+     +tbl('החיפושים הנפוצים',s.top,'עדיין אין נתונים')+tbl('חיפושים בלי תוצאה (מוצרים שחסרים?)',s.miss,'אין, מצוין')
+     +`<h3>חיפושים לפי סניף</h3>`+(br.length?`<table><tr><th>סניף</th><th>חיפושים</th></tr>${br.map(([c,v])=>`<tr><td>${esc(c==='admin'?'מנהל רשת':(j.names[c]||c))}</td><td class="n">${v}</td></tr>`).join('')}</table>`:'<div class="note">עדיין אין נתונים</div>')
+     +`<div class="note">הספירה משוערת. נשמרים טקסטי חיפוש וספירות בלבד, בלי זהות המחפש.</div><button id="reset">אפס סטטיסטיקות</button>`;
+  }
+  out.innerHTML=html;
+  const b=document.getElementById('reset');if(b)b.onclick=async()=>{if(confirm('לאפס את כל הסטטיסטיקות?')){await fetch('/api/admin/stats?reset=1',{method:'POST'});load()}};
+}
+load();
+</script></body></html>
