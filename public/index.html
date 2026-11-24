@@ -800,19 +800,20 @@ async function scrWar(){
 let EXP={vs:'',c:'1',p:'0',sort:'gap',q:'',page:0,rows:[],total:0};try{Object.assign(EXP,JSON.parse(localStorage.o24exp||'{}'),{page:0,rows:[]})}catch(e){}
 async function scrExp(){
   const me=MINE(),sel=(id,lab,opts,cur)=>`<div><label for="${id}">${lab}</label><select id="${id}">${opts.map(([v,l])=>`<option value="${v}" ${String(cur)===String(v)?'selected':''}>${l}</option>`).join('')}</select></div>`;
-  out.innerHTML=`<div class="card2"><h2>איפה אני יקר</h2><div class="note">מוצרים שבהם ${esc(nm(me))} יקר מהסניף הזול ביותר (או מסניף שבחרת)</div>
+  out.innerHTML=`<div class="card2"><h2>איפה אני יקר</h2><div class="note">${EXP.vs?`כל המוצרים ש-<b>${esc(nm(EXP.vs))}</b> זול ממני ב-₪${EXP.c} או יותר`:`מוצרים שבהם ${esc(nm(me))} יקר מהסניף הזול ביותר (או מסניף שבחרת)`}</div>
+  <div class="acts" id="xchips" style="margin-top:8px"><span class="note">זול ממני ב:</span>${['1','2','5','10'].map(v=>`<button type="button" class="chip${String(EXP.c)===v?' on':''}" data-c="${v}" aria-pressed="${String(EXP.c)===v}">${v} ₪+</button>`).join('')}</div>
   <div class="flt">${sel('xvs','מול סניף',[['','כל הסניפים'],...Object.keys(NAMES).filter(c=>c!==me).sort((a,b)=>nm(a).localeCompare(nm(b),'he')).map(c=>[c,nm(c)])],EXP.vs)}
   ${sel('xc','פער מינימלי (₪)',['0.1','0.2','0.5','1','2','5','10'].map(v=>[v,v]),EXP.c)}${sel('xp','פער מינימלי (%)',['0','3','5','10','20'].map(v=>[v,v+'%']),EXP.p)}${sel('xs','מיון',[['gap','לפי גודל הפער'],['n','לפי מספר סניפים זולים']],EXP.sort)}
   <div style="grid-column:1/-1"><label for="xq">שם מוצר (אופציונלי)</label><input id="xq" type="search" value="${esc(EXP.q)}"></div></div>
   <div class="acts" id="xact"></div></div><div class="lst" id="xl" style="margin-top:12px"></div><div id="xm" style="margin-top:10px"></div>`;
   const go=()=>{EXP.vs=$('#xvs').value;EXP.c=$('#xc').value;EXP.p=$('#xp').value;EXP.sort=$('#xs').value;EXP.q=$('#xq').value.trim();EXP.page=0;EXP.rows=[];try{localStorage.o24exp=JSON.stringify({vs:EXP.vs,c:EXP.c,p:EXP.p,sort:EXP.sort})}catch(e){}expLoad()};
-  ['xvs','xc','xp','xs'].forEach(i=>$('#'+i).onchange=go);let t;$('#xq').oninput=()=>{clearTimeout(t);t=setTimeout(go,500)};
+  ['xvs','xc','xp','xs'].forEach(i=>$('#'+i).onchange=go);document.querySelectorAll('#xchips [data-c]').forEach(b=>b.onclick=()=>{EXP.c=b.dataset.c;EXP.q=$('#xq').value.trim();EXP.vs=$('#xvs').value;try{localStorage.o24exp=JSON.stringify({vs:EXP.vs,c:EXP.c,p:EXP.p,sort:EXP.sort})}catch(e){};scrExp()});let t;$('#xq').oninput=()=>{clearTimeout(t);t=setTimeout(go,500)};
   EXP.rows=[];EXP.page=0;await expLoad()}
 async function expLoad(){
   const me=MINE(),u=`/api/exp?me=${me}&vs=${EXP.vs}&minc=${EXP.c}&minp=${EXP.p}&sort=${EXP.sort}&q=${encodeURIComponent(EXP.q)}&mode=${MODE}&page=${EXP.page}`;
   let d;try{d=await jget(u)}catch(e){return noRpc()}
   if(SCR!=='exp')return;EXP.rows=EXP.rows.concat(d.rows||[]);EXP.total=d.total||0;
-  $('#xl').innerHTML=EXP.rows.map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>הכי זול: ${esc(nm(r.cheapest))} ${fmt(r.cheapest_price)}${EXP.vs?'':' · '+r.n_cheaper+' סניפים זולים ב־₪'+EXP.c+'+'}</small></span><span class="pr">${fmt(r.m)}</span><span class="df up">+${fmt(r.m-r.cheapest_price)}</span></div>`).join('')||'<div class="state">לא נמצאו מוצרים לפי הסינון</div>';
+  $('#xl').innerHTML=EXP.rows.map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>${EXP.vs?'':'הכי זול: '}${esc(nm(r.cheapest))} ${fmt(r.cheapest_price)}${EXP.vs?' · אצלי '+fmt(r.m):''}${EXP.vs?'':' · '+r.n_cheaper+' סניפים זולים ב־₪'+EXP.c+'+'}</small></span><span class="pr">${fmt(r.m)}</span><span class="df up">+${fmt(r.m-r.cheapest_price)}</span></div>`).join('')||'<div class="state">לא נמצאו מוצרים לפי הסינון</div>';
   $('#xm').innerHTML=(d.more?'<button class="chip" id="xmore">עוד תוצאות</button> ':'')+`<span class="mono">${EXP.rows.length} מתוך ${EXP.total}</span>`;
   $('#xact').innerHTML=EXP.rows.length&&MGR()?'<button class="chip add" id="xcart">🧺 הוסף לסל (עד 60)</button><button class="chip go" id="xxl">📊 Excel</button><button class="chip go" id="xwa">📲 וואטסאפ</button>':'';
   if($('#xmore'))$('#xmore').onclick=()=>{EXP.page++;expLoad()};
@@ -1014,9 +1015,11 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     const opt=s=>codes.map(c=>`<option value="${c}" ${c===s?'selected':''}>${esc(nm(c))}</option>`).join('');
     cmp.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">השוואת שני סניפים</h2><button class="chip" id="cmpx">סגור ✕</button></div>
     <div style="display:flex;gap:8px;align-items:center;margin-top:10px"><select id="ca" aria-label="סניף א">${opt(CA)}</select><span>מול</span><select id="cb" aria-label="סניף ב">${opt(CB)}</select></div>
+    ${CA===MINE()?`<button type="button" class="chip go" id="cmpall" style="margin-top:10px">📋 כל המוצרים: ${esc(nm(CB))} זול ממני ב-₪1/2/5/10</button>`:''}
     ${rows.length?`<div class="avg"><b>${esc(nm(CA))}</b> זול ב-${a} מוצרים · <b>${esc(nm(CB))}</b> זול ב-${b} · שווים ב-${e}<br>סכום המוצרים (${rows.length}): ${fmt(sa)} מול ${fmt(sb)} · ${sa===sb?'שווה':sa<sb?`<span class="win">${esc(nm(CA))} זול ב-${fmt(sb-sa)}</span>`:`<span class="win">${esc(nm(CB))} זול ב-${fmt(sa-sb)}</span>`}</div>
     <table><tr><th>מוצר</th><th>${esc(nm(CA))}</th><th>${esc(nm(CB))}</th><th>פער</th></tr>${rows.slice(0,60).map(r=>`<tr><td>${esc(r.n)}</td><td class="n ${r.diff<-.004?'win':''}">${fmt(r.x)}</td><td class="n ${r.diff>.004?'win':''}">${fmt(r.y)}</td><td class="n">${Math.abs(r.diff)<.005?'—':(r.diff>0?'+':'−')+fmt(Math.abs(r.diff))}</td></tr>`).join('')}</table>`
     :'<div class="state"><b>⚖️</b>אין מוצרים להשוואה<br><span class="mono">חפש מוצרים או הוסף לסל, וחזור לכאן. ההשוואה היא על התוצאות הנוכחיות והסל.</span></div>'}`;
+    if(cmp.querySelector('#cmpall'))cmp.querySelector('#cmpall').onclick=()=>{EXP.vs=CB;EXP.page=0;cmp.classList.remove('on');document.body.style.overflow='';openScr('exp')};
     cmp.querySelector('#cmpx').onclick=()=>{cmp.classList.remove('on');document.body.style.overflow=''};
     cmp.querySelector('#ca').onchange=e=>{CA=e.target.value;drawCmp()};cmp.querySelector('#cb').onchange=e=>{CB=e.target.value;drawCmp()};
   }
