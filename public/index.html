@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#eef7f1">
 <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials">
-<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="אושר24">
 <title>אושר24 · מי הכי זול?</title>
 <style>
 :root{
@@ -230,7 +230,7 @@ html[data-hc] .chip,html[data-hc] .search,html[data-hc] select,html[data-hc] inp
 .hist{max-height:60vh;overflow:auto;margin-top:8px}.hist button{all:unset;box-sizing:border-box;width:100%;display:flex;justify-content:space-between;gap:10px;padding:12px 4px;border-top:1px solid var(--line,#ddd);cursor:pointer;min-height:44px;align-items:center}
 .hist small{font:12px var(--mono);color:var(--mute);direction:ltr}.hist input{width:100%;padding:10px;font:inherit}
 /* ---- parity screens ---- */
-body[data-scr]:not([data-scr=search]) .sonly{display:none!important}
+body[data-scr]:not([data-scr=search]) .sonly,body[data-scr]:not([data-scr=search]) #toc{display:none!important}
 html[data-role=viewer] .mgr{display:none!important}
 #scrnav{margin:10px 0 0;overflow-x:auto;flex-wrap:nowrap}#scrnav .chip{white-space:nowrap}
 #modebar{margin-top:8px}#miss{display:none;margin:8px 0;padding:8px 12px;border-radius:12px;background:#ffe9c9;color:#5a3a00;font-weight:700;font-size:14px}#miss.on{display:block}
@@ -256,6 +256,10 @@ html[data-role=viewer] .mgr{display:none!important}
   <div class="sub mono"><span>מי הכי זול ב-24 סניפים?</span><span id="upd"></span></div>
   <nav class="fl" id="scrnav" aria-label="מסכים">
     <button type="button" class="chip" data-scr="search" aria-pressed="true">🔍 חיפוש</button>
+    <button type="button" class="chip" data-scr="dept" aria-pressed="false">🏷️ מחלקות</button>
+    <button type="button" class="chip" data-scr="war" aria-pressed="false">⚔️ מלחמת סניפים</button>
+    <button type="button" class="chip" data-scr="exp" aria-pressed="false">🔻 איפה אני יקר</button>
+    <button type="button" class="chip" data-scr="promos" aria-pressed="false">★ מבצעים</button>
   </nav>
   <div class="fl" id="modebar"><button type="button" class="chip" data-mode="eff" aria-pressed="true">כולל מבצעים</button><button type="button" class="chip" data-mode="reg" aria-pressed="false">מחיר מדף בלבד</button></div>
   <form class="search" id="f" role="search">
@@ -296,7 +300,7 @@ const MINE=()=>$('#mine').value;
 const fmt=p=>'₪'+Number(p).toFixed(2);
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state=(ic,t)=>out.innerHTML=`<div class="state"><b>${ic}</b>${t}</div>`;
-function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1400)}
+function toast(t,ms){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),ms||1400)}
 
 async function meta(){
   const b=$('#stale');
@@ -409,6 +413,7 @@ function show(){
     <div class="acts mgr">
       <button class="chip add ${inCart(it.code)?'in-cart':''}" data-act="add">${inCart(it.code)?'✓ בסל':'🧺 הוסף לסל'}</button>
       <button class="chip go" data-act="share">📤 שתף / ייצוא</button>
+      <a class="chip go" target="_blank" rel="noopener" href="https://chp.co.il/${encodeURIComponent(nm(mine))}/0/0/${encodeURIComponent(it.code)}/0">🔎 CHP</a>
     </div>
   </div>
   <h3>כל הסניפים</h3>
@@ -727,7 +732,7 @@ function setScr(n){SCR=n;document.body.dataset.scr=n;document.querySelectorAll('
 async function jget(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()}
 function noRpc(){out.innerHTML='<div class="state"><b>🔌</b>המסך הזה דורש את הפונקציות החדשות במסד הנתונים<br><span class="mono">הרץ את db/br24_readonly_rpcs.sql (ראה README)</span></div>'}
 function openScr(n,arg){setScr(n);$('#sug').innerHTML='';if(n==='search'){out.innerHTML='';if(RAW.length){LAST=mview(RAW);applyFilter()}else out.innerHTML='<div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div>';return}
-  out.innerHTML='<div class="sk"></div>';({war:scrWar,exp:scrExp,promos:scrPromos})[n](arg).catch(noRpc)}
+  out.innerHTML='<div class="sk"></div>';({war:scrWar,exp:scrExp,promos:scrPromos,dept:scrDept})[n](arg).catch(noRpc)}
 $('#scrnav').onclick=e=>{const b=e.target.closest('[data-scr]');if(b)openScr(b.dataset.scr)};
 async function scrWar(){
   const me=MINE(),d=await jget('/api/war?me='+me+'&mode='+MODE);if(SCR!=='war')return;
@@ -782,6 +787,40 @@ async function prmLoad(){
   $('#pm').innerHTML=(d.more?'<button class="chip" id="pmore">עוד</button> ':'')+`<span class="mono">${PRM.rows.length} מתוך ${PRM.total}</span>`;
   if($('#pmore'))$('#pmore').onclick=()=>{PRM.page++;prmLoad()};
   $('#pl').onclick=e=>{const r=e.target.closest('[data-code]');if(r){$('#q').value=r.dataset.code;find()}}}
+
+/* ---------- departments (name-based classification, like PriceWatch; needs br24_list) ---------- */
+let DEPT={key:'',rows:null,C:null},DP={d:'',min:'0.1',q:'',n:100};
+async function deptLoad(){
+  const me=MINE(),key=me+'|'+MODE;if(DEPT.key===key&&DEPT.rows)return DEPT.rows;
+  const C=DEPT.C||(DEPT.C=await import('/classify.js')),all=[];
+  for(let pg=0;pg<12;pg++){const d=await jget(`/api/list?me=${me}&mode=${MODE}&page=${pg}`);(d.rows||[]).forEach(r=>{const dp=C.classify(r[1],null,false);if(dp)all.push({code:r[0],name:r[1],m:r[2],cheapest_price:r[3],cheapest:r[4],n_cheaper:r[5],dept:dp})});if(!d.more)break}
+  DEPT.key=key;DEPT.rows=all;return all}
+async function scrDept(arg){
+  if(typeof arg==='string'&&arg)DP.d=arg;else if(arg===undefined)DP.d='';
+  const rows=await deptLoad();if(SCR!=='dept')return;const me=MINE();
+  if(!DP.d){
+    const g={};rows.forEach(r=>{const x=g[r.dept]||(g[r.dept]={n:0,exp:0,gap:0});x.n++;const f=r.m-r.cheapest_price;if(f>=0.1){x.exp++;x.gap+=f}});
+    const order=DEPT.C.DEPTS.filter(d=>g[d]);
+    out.innerHTML=`<div class="card2"><h2>מחלקות</h2><div class="note">${esc(nm(me))} מול הסניף הזול ביותר, לפי מחלקה. המחלקה נקבעת לפי שם המוצר.</div>
+    <table class="tbl"><tr><th>מחלקה</th><th>מוצרים</th><th>יקר ממני</th><th>סך פער</th></tr>${order.map(d=>`<tr data-dept="${esc(d)}" style="cursor:pointer"><td><b>${esc(d)}</b></td><td>${g[d].n}</td><td>${g[d].exp}</td><td>${fmt(g[d].gap)}</td></tr>`).join('')}</table></div>`;
+    out.querySelectorAll('[data-dept]').forEach(x=>x.onclick=()=>{DP.n=100;openScr('dept',x.dataset.dept)});return}
+  const sel=(id,lab,opts,cur)=>`<div><label for="${id}">${lab}</label><select id="${id}">${opts.map(([v,l])=>`<option value="${v}" ${String(cur)===String(v)?'selected':''}>${l}</option>`).join('')}</select></div>`;
+  const mine=rows.filter(r=>r.dept===DP.d);
+  out.innerHTML=`<div class="card2"><h2>${esc(DP.d)}</h2><div class="note">מוצרים שבהם ${esc(nm(me))} יקר מהסניף הזול ביותר, מהפער הגדול לקטן</div>
+  <div class="flt">${sel('dmin','יקר ממני ב־',['0.1','0.2','0.3','0.5','1','2','3','5','10'].map(v=>[v,'₪'+v+' ומעלה']),DP.min)}<div><label for="dq">שם מוצר</label><input id="dq" type="search" value="${esc(DP.q)}"></div></div>
+  <div class="acts" id="dact"></div></div><div class="lst" id="dl" style="margin-top:12px"></div><div id="dm" style="margin-top:10px"></div>
+  <div style="margin-top:10px"><button class="chip" id="dback">← כל המחלקות</button></div>`;
+  const draw=()=>{const mn=+DP.min,q=DP.q.toLowerCase(),f=mine.filter(r=>r.m-r.cheapest_price>=mn-0.004&&(!q||r.name.toLowerCase().includes(q))).sort((a,b)=>(b.m-b.cheapest_price)-(a.m-a.cheapest_price));
+    EXP.rows=f;EXP.total=f.length;EXP.vs='';EXP.c=DP.min;
+    $('#dl').innerHTML=f.slice(0,DP.n).map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>הכי זול: ${esc(nm(r.cheapest))} ${fmt(r.cheapest_price)} · ${r.n_cheaper} סניפים זולים ממני</small></span><span class="pr">${fmt(r.m)}</span><span class="df up">+${fmt(r.m-r.cheapest_price)}</span></div>`).join('')||'<div class="state">אין מוצרים לפי הסינון</div>';
+    $('#dm').innerHTML=(f.length>DP.n?'<button class="chip" id="dmore">עוד תוצאות</button> ':'')+`<span class="mono">${Math.min(DP.n,f.length)} מתוך ${f.length} (במחלקה ${mine.length})</span>`;
+    $('#dact').innerHTML=f.length&&MGR()?'<button class="chip add" id="dcart">🧺 הוסף הכל לסל (עד 60)</button><button class="chip go" id="dxl">📊 Excel</button><button class="chip go" id="dwa">📲 וואטסאפ</button>':'';
+    if($('#dmore'))$('#dmore').onclick=()=>{DP.n+=100;draw()};
+    $('#dl').onclick=e=>{const r=e.target.closest('[data-code]');if(r){setScr('search');$('#q').value=r.dataset.code;find()}};
+    if($('#dcart'))$('#dcart').onclick=()=>{let n=0;f.slice(0,60).forEach(r=>{if(!inCart(r.code)){CART.push({code:r.code,name:r.name,qty:1,d:{}});n++}});saveCart();updCartBtn();toast(n?'נוספו '+n+' מוצרים לסל':'כבר בסל')};
+    if($('#dxl'))$('#dxl').onclick=expXlsx;if($('#dwa'))$('#dwa').onclick=expWa};
+  $('#dmin').onchange=()=>{DP.min=$('#dmin').value;DP.n=100;draw()};let t;$('#dq').oninput=()=>{clearTimeout(t);t=setTimeout(()=>{DP.q=$('#dq').value.trim();DP.n=100;draw()},300)};
+  $('#dback').onclick=()=>openScr('dept','');draw()}
 async function loadStatus(){try{STATUS=await jget('/api/status');const m=(STATUS.missing||[]).map(c=>nm(c)),b=$('#miss');
   if(m.length){b.textContent='לא התקבלו נתונים מ־'+m.length+' סניפים בעדכון האחרון: '+m.join(', ');b.classList.add('on')}else b.classList.remove('on')}catch(e){}}
 
@@ -847,6 +886,18 @@ addEventListener('online',()=>offBanner(''));
     else if(a==='hc')A.hc=A.hc?0:1;else if(a==='rm')A.rm=A.rm?0:1;else A={z:1,hc:0,rm:0};apply()};
   addEventListener('keydown',e=>{if(e.key==='Escape'&&p.classList.contains('on')){p.classList.remove('on');b.focus()}});
   apply();
+})();
+
+/* ---------- install as an app (Android Chrome) ---------- */
+(()=>{
+  if(matchMedia('(display-mode: standalone)').matches||navigator.standalone)return;
+  const nav=document.getElementById('scrnav'),b=document.createElement('button');b.type='button';b.className='chip';b.textContent='📲 התקן אפליקציה';nav.appendChild(b);
+  let dp=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e});
+  addEventListener('appinstalled',()=>b.remove());
+  b.onclick=async()=>{
+    if(dp){dp.prompt();try{await dp.userChoice}catch(x){}dp=null;return}
+    const ua=navigator.userAgent,inApp=/FBAN|FBAV|Instagram|WhatsApp|; wv\)|Line\//.test(ua);
+    toast(inApp?'פתח את הקישור ב-Chrome (תפריט ⋮, "פתח בדפדפן") ואז התקן':'ב-Chrome: תפריט ⋮ ← "התקן אפליקציה" או "הוסף למסך הבית"',6000)};
 })();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 </script>
