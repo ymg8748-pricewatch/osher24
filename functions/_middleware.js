@@ -6,9 +6,10 @@
 //   ADMIN_PASSWORD     optional; a network manager who can switch between branches (SITE_PASSWORD is accepted as a legacy name)
 //   KV (binding)       optional; enables login rate limiting (and usage statistics)
 import { names } from './_branches.js';
+import { overrides, hashPw } from './_pw.js';
 
 const enc = new TextEncoder();
-const TTL = 30 * 86400; // session length, seconds
+const TTL = 365 * 86400; // session length, seconds (renewed on every visit to the home page)
 const PUBLIC = new Set(['/manifest.webmanifest', '/sw.js', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/logo.png']);
 const MAX_FAILS = 8, WINDOW = 900; // login failures per IP per 15 minutes (needs KV)
 
@@ -51,9 +52,11 @@ export async function onRequest(ctx) {
   let pw = {};
   try { pw = JSON.parse(env.BRANCH_PASSWORDS || '{}'); } catch (e) { return new Response('bad BRANCH_PASSWORDS', { status: 503 }); }
   let vpw = {}; try { vpw = JSON.parse(env.VIEWER_PASSWORDS || '{}'); } catch (e) { return new Response('bad VIEWER_PASSWORDS', { status: 503 }); }
-  const codes = Object.keys({ ...pw, ...vpw }).filter(c => names[c] && (pw[c] || vpw[c])).sort((a, b) => names[a].localeCompare(names[b], 'he'));
+  const ov = await overrides(env); // branch passwords changed from the admin screen (hashes)
+  const ovOf = r => (/^\d+$/.test(r) && ov[r] && ov[r].h) ? 'h:' + ov[r].h : null;
+  const codes = Object.keys({ ...pw, ...vpw, ...ov }).filter(c => names[c] && (pw[c] || vpw[c] || ov[c])).sort((a, b) => names[a].localeCompare(names[b], 'he'));
   if (!env.COOKIE_SECRET || (!admin && !codes.length)) return new Response('not configured', { status: 503 });
-  const secretFor = role => (role === 'admin' ? admin : /^v\d+$/.test(role) ? vpw[role.slice(1)] : pw[role]) || '';
+  const secretFor = role => (role === 'admin' ? admin : /^v\d+$/.test(role) ? vpw[role.slice(1)] : (ovOf(role) || pw[role])) || '';
   const url = new URL(request.url);
   if (url.pathname === '/api/health') return next(); // protected by its own HEALTH_KEY
   if (PUBLIC.has(url.pathname)) return next();
@@ -70,7 +73,8 @@ export async function onRequest(ctx) {
     if (f.get('kind') === 'viewer' && codes.includes(role)) role = 'v' + role;
     const real = (role === 'admin' || codes.includes(role) || (/^v\d+$/.test(role) && codes.includes(role.slice(1)))) ? secretFor(role) : '';
     // always run one comparison so a wrong branch and a wrong password take the same time
-    const ok = (await safeEq(env.COOKIE_SECRET, given, real || '\u0000no-such-password')) && !!real;
+    const givenId = ovOf(role) ? 'h:' + await hashPw(env, role, given) : given;
+    const ok = (await safeEq(env.COOKIE_SECRET, givenId, real || '\u0000no-such-password')) && !!real;
     if (!ok) {
       console.warn('login failed', JSON.stringify({ role: role.slice(0, 8), ip }));
       if (env.KV) { try { await env.KV.put(rlKey, String(fails + 1), { expirationTtl: WINDOW }); } catch (e) { console.error('rl write failed', String(e)); } }
@@ -80,10 +84,10 @@ export async function onRequest(ctx) {
     if (env.KV && fails) { try { await env.KV.delete(rlKey); } catch (e) {} }
     const payload = `${role}.${Math.floor(Date.now() / 1000) + TTL}`;
     const sig = await hmac(env.COOKIE_SECRET, payload + ':' + real);
-    return new Response(null, { status: 303, headers: { location: '/', 'set-cookie': `o24=${payload}.${sig}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${TTL}` } });
+    return new Response(null, { status: 303, headers: { location: '/', 'set-cookie': `o24=${payload}.${sig}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${TTL}` } });
   }
   if (url.pathname === '/logout') {
-    return new Response(null, { status: 303, headers: { location: '/', 'set-cookie': 'o24=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0' } });
+    return new Response(null, { status: 303, headers: { location: '/', 'set-cookie': 'o24=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0' } });
   }
 
   const m = (request.headers.get('cookie') || '').match(/(?:^|; )o24=(admin|v?\d+)\.(\d+)\.([0-9a-f]+)/);
@@ -92,7 +96,13 @@ export async function onRequest(ctx) {
     if (real && Number(exp) > Date.now() / 1000 && await safeEq(env.COOKIE_SECRET, sig, await hmac(env.COOKIE_SECRET, `${role}.${exp}:${real}`))) {
       data.role = role === 'admin' ? 'admin' : role[0] === 'v' ? 'viewer' : 'branch';
       data.branch = role === 'admin' ? null : role.replace(/^v/, '');
-      return next();
+      const res = await next();
+      if (url.pathname === '/' && request.method === 'GET') { // keep the session alive: a new year from every visit
+        const exp2 = Math.floor(Date.now() / 1000) + TTL, out = new Response(res.body, res);
+        out.headers.append('set-cookie', `o24=${role}.${exp2}.${await hmac(env.COOKIE_SECRET, `${role}.${exp2}:${real}`)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${TTL}`);
+        return out;
+      }
+      return res;
     }
   }
   return page(false, '', codes);

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="he" dir="rtl"><head><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ניהול · אושר24</title>
 <style>
 :root{--paper:#f2eee3;--ink:#111;--lime:#c9ff2f;--hot:#ff5a1f;--card:#fffdf7;--mute:#6d6a60}
@@ -13,9 +13,19 @@ h3{font:700 12px ui-monospace,monospace;letter-spacing:.06em;margin:24px 0 8px;d
 table{width:100%;border-collapse:collapse;background:var(--card);border:2px solid var(--ink)}td,th{padding:6px 10px;text-align:start;border-bottom:1px dashed #b9b4a4}th{font:700 11px ui-monospace,monospace;color:var(--mute)}
 td.n{text-align:end;font-weight:800;width:70px}
 button{border:2px solid var(--ink);background:var(--card);padding:6px 12px;font:700 13px inherit;font-family:inherit;cursor:pointer;margin-top:10px}
+input.p{border:2px solid var(--ink);padding:6px 8px;font:inherit;width:120px;background:#fff}.pr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:2px solid var(--ink);background:var(--card);padding:8px 10px;margin-bottom:6px}.pr .pn{flex:1 1 130px;font-weight:800}.pr button{margin:0}.st{font:700 11px ui-monospace,monospace;color:var(--mute)}.st.c{color:#1a7a2e}
 .note{font-size:13px;color:var(--mute);margin-top:8px}
-</style></head><body><div class="wrap">
-<h1>ניהול <a href="/">← לאתר</a></h1><div id="out">טוען...</div></div>
+</style><style>
+:root{--paper:#10151a;--ink:#f2f5f3;--card:#1b232a;--mute:#a9b6bd;--lime:#c6ff4d;--hot:#ff8f84}
+body{font-family:Heebo,system-ui,Arial,sans-serif}
+.pr,.t,table,input.p,button{border:1px solid #2d3a43!important;border-radius:14px}
+table{border-collapse:separate;overflow:hidden}h3::after{background:#2d3a43}
+.t.ok{background:#1d3a2c;color:#7fe0a8}.t.ok small{color:#7fe0a8}.t.bad{background:#3a1f1d;color:#ff8f84}.t.bad small{color:#ff8f84}
+input.p{background:#10151a;color:#f2f5f3}button{background:#232e36;color:#f2f5f3}button.sv{background:#c6ff4d;color:#10151a;border-color:#c6ff4d!important;font-weight:800}
+.st.c{color:#7fe0a8}td,th{border-bottom-color:#2d3a43}
+</style>
+</head><body><div class="wrap">
+<h1>ניהול <a href="/">← לאתר</a></h1><div id="pw"></div><div id="out">טוען...</div></div>
 <script>
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const tbl=(title,o,empty)=>{const r=Object.entries(o||{}).sort((a,b)=>b[1]-a[1]).slice(0,15);
@@ -46,4 +56,17 @@ async function load(){
   const b=document.getElementById('reset');if(b)b.onclick=async()=>{if(confirm('לאפס את כל הסטטיסטיקות?')){await fetch('/api/admin/stats?reset=1',{method:'POST'});load()}};
 }
 load();
+async function loadPw(){
+  const box=document.getElementById('pw');
+  const r=await fetch('/api/admin/pw');
+  if(!r.ok){box.innerHTML='';return}
+  const j=await r.json();
+  box.innerHTML=`<h3>סיסמאות סניפים</h3>${j.rows.map(x=>`<div class="pr" data-c="${esc(x.code)}"><div class="pn"><a href="/?b=${esc(x.code)}" style="color:inherit">${esc(x.name)}</a> <span class="st">${esc(x.code)}</span><div class="st ${x.custom?'c':''}">${x.custom?'שונתה '+new Date(x.at).toLocaleDateString('he-IL'):'ברירת מחדל (מספר הסניף)'}</div></div><input class="p" type="text" autocomplete="off" placeholder="סיסמה חדשה" maxlength="64"><button class="sv">שמור</button>${x.custom?'<button class="rs">איפוס</button>':''}</div>`).join('')}<div class="note">הסיסמה נשמרת מוצפנת (גיבוב) ואי אפשר להציג אותה אחר כך. שינוי מנתק את הסניף הזה מיד, ושאר הסניפים לא מושפעים. עד דקה עד שהשינוי נקלט בכל השרתים. כניסת מנהל רשת נשארת כמו שהייתה. לפחות 4 תווים.</div>`;
+  box.querySelectorAll('.pr[data-c]').forEach(tr=>{
+    const c=tr.dataset.c,post=b=>fetch('/api/admin/pw',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:c,...b})});
+    tr.querySelector('.sv').onclick=async()=>{const v=tr.querySelector('input').value;if(v.length<4){alert('לפחות 4 תווים');return}const r=await post({password:v});if(r.ok)loadPw();else alert('השמירה נכשלה')};
+    const rs=tr.querySelector('.rs');if(rs)rs.onclick=async()=>{if(confirm('להחזיר לסיסמת ברירת המחדל (מספר הסניף)?')){const r=await post({reset:true});if(r.ok)loadPw();else alert('הפעולה נכשלה')}};
+  });
+}
+loadPw();
 </script></body></html>
