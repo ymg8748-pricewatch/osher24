@@ -9,7 +9,7 @@ import { names } from './_branches.js';
 
 const enc = new TextEncoder();
 const TTL = 30 * 86400; // session length, seconds
-const PUBLIC = new Set(['/manifest.webmanifest', '/sw.js', '/icon-192.png', '/icon-512.png']);
+const PUBLIC = new Set(['/manifest.webmanifest', '/sw.js', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/logo.png']);
 const MAX_FAILS = 8, WINDOW = 900; // login failures per IP per 15 minutes (needs KV)
 
 async function hmac(secret, msg) {
@@ -31,7 +31,7 @@ function page(err, chosen, codes) {
   return new Response(`<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>כניסה · אושר24</title>
 <body style="margin:0;background:#f2eee3;font-family:system-ui,Arial,sans-serif;display:flex;justify-content:center;padding:14vh 14px 0">
 <form method="post" action="/login" style="width:100%;max-width:340px;background:#fffdf7;border:2px solid #111;box-shadow:4px 4px 0 #111;padding:20px">
-<div style="font-weight:900;font-size:34px;letter-spacing:-.05em;margin-bottom:14px">אושר<span style="background:#c9ff2f;border:2px solid #111;padding:0 6px;margin-right:6px">24</span></div>
+<div style="text-align:center;margin-bottom:10px"><img src="/logo.png" alt="השוואת מחירים" style="width:70%;max-width:230px;height:auto"></div>
 <label style="font:700 12px ui-monospace,monospace;color:#6d6a60">סניף</label>
 <select name="branch" style="display:block;width:100%;margin:4px 0 12px;padding:10px;font:700 16px inherit;border:2px solid #111;background:#fff;border-radius:0">${opts}<option value="admin"${chosen === 'admin' ? ' selected' : ''}>מנהל רשת</option></select>
 <label style="font:700 12px ui-monospace,monospace;color:#6d6a60">סוג כניסה</label>
