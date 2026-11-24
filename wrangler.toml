@@ -1,0 +1,10 @@
+name = "osher24"
+pages_build_output_dir = "public"
+compatibility_date = "2025-01-01"
+
+# Optional: usage statistics and login rate limiting.
+# Create a KV namespace (Workers & Pages > KV), then in the Pages project: Settings > Bindings > KV namespace, variable name "KV".
+# (For local runs, uncomment and fill in the id.)
+# [[kv_namespaces]]
+# binding = "KV"
+# id = "<namespace id>"

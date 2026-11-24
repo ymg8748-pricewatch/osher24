@@ -1,0 +1,9 @@
+SB_URL=
+SB_ANON=
+BR24_TOKEN=
+COOKIE_SECRET=change-me-long-random
+BRANCH_PASSWORDS={"022":"test-ashkelon","024":"test-telaviv"}
+ADMIN_PASSWORD=test-admin
+# optional
+HEALTH_KEY=change-me
+#ALERT_WEBHOOK=https://hooks.slack.com/...
