@@ -4,6 +4,7 @@ export async function rpc(env, fn, body) {
     method: 'POST',
     headers: { apikey: env.SB_ANON, Authorization: `Bearer ${env.SB_ANON}`, 'content-type': 'application/json' },
     body: JSON.stringify({ tok: env.BR24_TOKEN, ...body }),
+    signal: AbortSignal.timeout(8000),
   });
   if (!r.ok) throw new Error('db ' + r.status);
   return r.json();
