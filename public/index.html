@@ -855,12 +855,12 @@ async function scrDept(arg){
     const g={};rows.forEach(r=>{const x=g[r.dept]||(g[r.dept]={n:0,exp:0,gap:0});x.n++;const f=r.m-r.cheapest_price;if(f>=0.1){x.exp++;x.gap+=f}});
     const order=DEPT.C.DEPTS.filter(d=>g[d]);
     out.innerHTML=`<div class="card2"><h2>מחלקות</h2><div class="note">${esc(nm(me))} מול הסניף הזול ביותר, לפי מחלקה. המחלקה נקבעת לפי שם המוצר.</div>
-    <table class="tbl"><tr><th>מחלקה</th><th>מוצרים</th><th>יקר ממני</th><th>סך פער</th></tr>${order.map(d=>`<tr data-dept="${esc(d)}" style="cursor:pointer"><td><b>${esc(d)}</b></td><td>${g[d].n}</td><td>${g[d].exp}</td><td>${fmt(g[d].gap)}</td></tr>`).join('')}</table></div>`;
+    <table class="tbl"><tr><th>מחלקה</th><th>מוצרים</th><th>זולים ממני</th><th>סך פער</th></tr>${order.map(d=>`<tr data-dept="${esc(d)}" style="cursor:pointer"><td><b>${esc(d)}</b></td><td>${g[d].n}</td><td>${g[d].exp}</td><td>${fmt(g[d].gap)}</td></tr>`).join('')}</table></div>`;
     out.querySelectorAll('[data-dept]').forEach(x=>x.onclick=()=>{DP.n=100;openScr('dept',x.dataset.dept)});return}
   const sel=(id,lab,opts,cur)=>`<div><label for="${id}">${lab}</label><select id="${id}">${opts.map(([v,l])=>`<option value="${v}" ${String(cur)===String(v)?'selected':''}>${l}</option>`).join('')}</select></div>`;
   const mine=rows.filter(r=>r.dept===DP.d);
   out.innerHTML=`<div class="card2"><h2>${esc(DP.d)}</h2><div class="note">מוצרים שבהם ${esc(nm(me))} יקר מהסניף הזול ביותר, מהפער הגדול לקטן</div>
-  <div class="flt">${sel('dmin','יקר ממני ב־',['0.1','0.2','0.3','0.5','1','2','3','5','10'].map(v=>[v,'₪'+v+' ומעלה']),DP.min)}<div><label for="dq">שם מוצר</label><input id="dq" type="search" value="${esc(DP.q)}"></div></div>
+  <div class="flt">${sel('dmin','זול ממני ב־',['0.1','0.2','0.3','0.5','1','2','3','5','10'].map(v=>[v,'₪'+v+' ומעלה']),DP.min)}<div><label for="dq">שם מוצר</label><input id="dq" type="search" value="${esc(DP.q)}"></div></div>
   <div class="acts" id="dact"></div></div><div class="lst" id="dl" style="margin-top:12px"></div><div id="dm" style="margin-top:10px"></div>
   <div style="margin-top:10px"><button class="chip" id="dback">← כל המחלקות</button></div>`;
   const draw=()=>{const mn=+DP.min,q=DP.q.toLowerCase(),f=mine.filter(r=>r.m-r.cheapest_price>=mn-0.004&&(!q||r.name.toLowerCase().includes(q))).sort((a,b)=>(b.m-b.cheapest_price)-(a.m-a.cheapest_price));
