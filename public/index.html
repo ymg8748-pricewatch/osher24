@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>סניפי אושר עד</title>
+<style>
+body{font-family:sans-serif;margin:12px;max-width:760px}
+input{padding:10px;font-size:16px;width:70%}button{padding:10px;font-size:16px}
+.card{border:1px solid #ccc;margin:12px 0;padding:8px}
+table{border-collapse:collapse;width:100%}td,th{padding:4px 6px;border-bottom:1px solid #eee;text-align:right}
+.lo{color:#0a7d3b;font-weight:bold}.hi{color:#b3261e;font-weight:bold}.promo{background:#fff3cd}.mine{background:#e6f4ff}
+#upd{color:#666;font-size:13px}
+</style></head><body>
+<h2>סניפי אושר עד</h2><div id="upd"></div>
+<p>הסניף שלי: <select id="mine"></select></p>
+<input id="q" placeholder="ברקוד או שם מוצר" inputmode="search"> <button id="go">חפש</button>
+<label><input type="checkbox" id="promoOnly" style="width:auto"> רק מבצעים</label>
+<div id="out"></div>
+<script>
+let NAMES={};
+const nm=c=>(NAMES[c]||('סניף '+c));
+const fmt=p=>'₪'+Number(p).toFixed(2);
+async function meta(){try{const m=await (await fetch('/api/meta')).json();const t=new Date(m.updated_at);document.getElementById('upd').textContent='עודכן '+t.toLocaleString('he-IL',{timeZone:'Asia/Jerusalem'})+' · '+m.rows+' מוצרים'}catch(e){}}
+async function find(){
+  const q=document.getElementById('q').value.trim();const out=document.getElementById('out');
+  if(q.length<2){out.textContent='הקלד לפחות 2 תווים';return}
+  out.textContent='מחפש...';
+  const r=await fetch('/api/find?q='+encodeURIComponent(q));
+  if(!r.ok){out.textContent='שגיאה בטעינה';return}
+  const j=await r.json();NAMES=j.names;fillMine();
+  const mine=document.getElementById('mine').value,only=document.getElementById('promoOnly').checked;
+  out.innerHTML='';
+  if(!j.items.length){out.textContent='לא נמצא';return}
+  for(const it of j.items){
+    // value: [shelf, effective] or [shelf, effective, promoQty, promoText, flag]
+    const rows=Object.entries(it.d).map(([c,v])=>({c,shelf:v[0],eff:v[1],promo:v.length>2?v[3]:null})).sort((a,b)=>a.eff-b.eff);
+    if(only&&!rows.some(r=>r.promo))continue;
+    const my=rows.find(r=>r.c===mine),lo=rows[0].eff,hi=rows[rows.length-1].eff;
+    const cheaper=my?rows.filter(r=>r.eff<my.eff).length:null;
+    const d=document.createElement('div');d.className='card';
+    d.innerHTML=`<b>${esc(it.name)}</b> <small dir="ltr">${esc(it.code)}</small>
+    <div>זול: ${fmt(lo)} · יקר: ${fmt(hi)}${my?` · אצלי: ${fmt(my.eff)} (זול ממני ב-${cheaper} מתוך ${rows.length-1})`:''}</div>
+    <table>${rows.map(r=>`<tr class="${r.c===mine?'mine':r.promo?'promo':''}"><td>${esc(nm(r.c))}</td><td class="${r.eff===lo?'lo':r.eff===hi?'hi':''}">${fmt(r.eff)}</td><td>${r.promo?esc(r.promo):(r.shelf!==r.eff?'מדף '+fmt(r.shelf):'')}</td></tr>`).join('')}</table>`;
+    out.appendChild(d);
+  }
+}
+function fillMine(){const s=document.getElementById('mine');if(s.options.length)return;for(const c of Object.keys(NAMES)){const o=document.createElement('option');o.value=c;o.textContent=NAMES[c];s.appendChild(o)}s.value=localStorage.mine||'022';s.onchange=()=>{localStorage.mine=s.value;find()}}
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+document.getElementById('go').onclick=find;document.getElementById('q').onkeydown=e=>{if(e.key==='Enter')find()};
+fetch('/api/find?q=').then(r=>r.json()).then(j=>{NAMES=j.names;fillMine();const p=new URLSearchParams(location.search).get('q');if(p){document.getElementById('q').value=p;find()}});meta();
+</script></body></html>
