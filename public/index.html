@@ -284,6 +284,10 @@ html[data-v='6'] body{background:#10151a;background-image:none;color:#f2f5f3;fon
 [data-v='6'] #fresh{background:#1d3a2c!important;color:#7fe0a8!important;border-radius:14px}[data-v='6'] #fresh *{color:#7fe0a8!important;background:transparent!important}[data-v='6'] .who select{box-shadow:none}
 .homec{cursor:pointer}.homec .hh{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 12px;font:800 20px inherit;font-family:inherit;letter-spacing:0}.homec .hh::after{display:none}.homec .hh small{font-size:13px;font-weight:600;color:var(--mute)}
 .more{display:block;width:100%;padding:12px 24px;border:0;border-radius:14px;background:var(--a,#c6ff4d);color:var(--on,#10151a);font:800 16px inherit;font-family:inherit;min-height:44px;cursor:pointer}
+[data-v='6'] #fresh.ok{background:#1d3a2c;color:#7fe0a8}[data-v='6'] #fresh.warn{background:#3a2a10;color:#ffb74d}[data-v='6'] #fresh.bad{background:#3a1f1d;color:#ff8f84}
+[data-v='6'] .pmk{background:#3a2a10;color:#ffb74d}[data-v='6'] .pmk.in,[data-v='6'] .tgp.in{background:#1d3a2c;color:#7fe0a8}[data-v='6'] .pmk.out,[data-v='6'] .tgp.out{background:#3a1f1d;color:#ff8f84}
+[data-v='6'] .avg{background:#232e36;color:#f2f5f3}[data-v='6'] .win{color:#7fe0a8}[data-v='6'] .lose{color:#ff8f84}
+[data-v='6'] #cmp,[data-v='6'] #cash{background:#10151a;color:#f2f5f3}[data-v='6'] #cash .cp{color:#c6ff4d}[data-v='6'] #cmp td,[data-v='6'] #cmp th{border-color:#2d3a43}
 /* bottom bar */
 [data-v='6'] #scrnav{position:fixed;inset-inline:0;bottom:0;margin:0;z-index:50;display:flex;gap:2px;justify-content:flex-start;align-items:center;height:72px;background:#0c1115;border-top:1px solid #222c34;padding:0 6px calc(env(safe-area-inset-bottom));overflow-x:auto;scrollbar-width:none}
 [data-v='6'] #scrnav::-webkit-scrollbar{display:none}
@@ -557,8 +561,9 @@ let exP=null;
 const loadEx=()=>exP||(exP=new Promise((ok,no)=>{if(window.ExcelJS)return ok(window.ExcelJS);
   const sc=document.createElement('script');sc.src=EXJS;sc.onload=()=>ok(window.ExcelJS);sc.onerror=()=>{exP=null;no(new Error('exceljs'))};document.head.appendChild(sc)}));
 function shareUrl(code){const u=new URL(location.href.split('#')[0].split('?')[0]);u.searchParams.set('q',code);if(ME.role==='admin')u.searchParams.set('b',MINE());return u.toString()}
-function modelFor(items){const mine=MINE(),dist={};if(GEO[mine])for(const c in GEO)dist[c]=km(GEO[mine],GEO[c]);
-  return{date:new Date(),mine,names:NAMES,reg:REG,regions:REGS,dist,items:items.map(i=>({name:i.name,code:i.code,qty:i.qty||1,d:mvd(i.d)}))}}
+const bkd=(d,q)=>Object.fromEntries(Object.entries(d).map(([c,v])=>[c,(q>=(v[2]||1)&&v[1]<v[0]-1e-9)?v:[v[0],v[0],v[2],v[3],v[4]]])); // basket: price paid now per unit, promotion only when the quantity qualifies
+function modelFor(items,bk){const mine=MINE(),dist={};if(GEO[mine])for(const c in GEO)dist[c]=km(GEO[mine],GEO[c]);
+  return{date:new Date(),mine,names:NAMES,reg:REG,regions:REGS,dist,items:items.map(i=>({name:i.name,code:i.code,qty:i.qty||1,d:bk?bkd(i.d,i.qty||1):mvd(i.d)}))}}
 let SH=null;
 const sheet=$('#sheet'),sbox=sheet.querySelector('.box');
 function openSheet(html){sbox.innerHTML=html;sheet.classList.add('on');document.body.style.overflow='hidden'}
@@ -636,10 +641,11 @@ function renderCart(){
   const box=$('#cart .in-wrap'),mine=MINE();
   const head='<div class="ch"><h2>הסל שלי</h2><button class="chip" data-cx="1">סגור ✕</button></div>';
   if(!CART.length){box.innerHTML=head+'<div class="state"><b>🧺</b>הסל ריק<br><span class="mono">הוסף מוצרים בכפתור "הוסף לסל"</span></div>';return}
-  const model=modelFor(CART),A=X.analyze({...model,forceBasket:true}),my=A.mine,best=A.best;
+  const model=modelFor(CART,true),A=X.analyze({...model,forceBasket:true}),my=A.mine,best=A.best;
   const count=CART.reduce((s,i)=>s+i.qty,0);
   box.innerHTML=head+`
   <div class="mono" style="margin:4px 0 6px">${CART.length} מוצרים · ${count} יחידות</div>
+  <div class="note" style="margin:0 0 8px">מחיר ליחידה כפי ששולמים היום, כולל מבצעים. מבצע כמות (למשל 2 ב-X) חל רק כשהכמות בסל מגיעה לכמות המבצע.</div>
   <div>${CART.map((i,k)=>`<div class="ci"><b>${esc(i.name)}</b>
     <span class="qty"><button data-q="${k}" data-d="-1" aria-label="הפחת">−</button><b>${i.qty}</b><button data-q="${k}" data-d="1" aria-label="הוסף">+</button></span>
     <span class="ct">${esc(i.code)} · <button class="lnk" data-rm="${k}">הסר</button></span></div>`).join('')}</div>
@@ -670,7 +676,7 @@ $('#cart').addEventListener('click',async e=>{
   const rm=t.closest('[data-rm]');if(rm){CART.splice(+rm.dataset.rm,1);saveCart();renderCart();return}
   if(t.closest('[data-clear]')){if(confirm('לרוקן את הסל?')){CART=[];saveCart();renderCart()}return}
   if(t.closest('[data-refresh]')){await refreshCart();renderCart();toast('המחירים רועננו');return}
-  if(t.closest('[data-cshare]'))openShare({...modelFor(CART),forceBasket:true},'הסל שלי · '+CART.length+' מוצרים');
+  if(t.closest('[data-cshare]'))openShare({...modelFor(CART,true),forceBasket:true},'הסל שלי · '+CART.length+' מוצרים');
 });
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(sheet.classList.contains('on'))closeSheet();else if($('#cart').classList.contains('on'))closeCart();stopScan()}});
 
