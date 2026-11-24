@@ -1,7 +1,7 @@
 <!doctype html>
-<html data-v="5" lang="he" dir="rtl"><head><meta charset="utf-8">
+<html data-v="6" lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#eef7f1">
+<meta name="theme-color" content="#10151a">
 <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials">
 <link rel="apple-touch-icon" href="/icon-192.png"><link rel="icon" href="/icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="אושר24">
 <title>אושר24 · מי הכי זול?</title>
@@ -244,6 +244,53 @@ html[data-role=viewer] .mgr{display:none!important}
 .t-low{background:#8fe0ad}.t-same{background:#cfe3ff}.t-warm{background:#ffd08a}.t-high{background:#ff9a8a}.t-missing{background:#e3e3e3;color:#666}
 .tier{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line,#ddd)}.tier:first-child{border-top:0}.tier b.pp{min-width:84px;font-size:20px;direction:ltr;text-align:end}
 .note{font-size:13px;color:var(--mute);margin-top:8px}
+
+/* ---- PriceWatch look (same palette, cards, bottom bar and fonts as the old site) ---- */
+html:root[data-v='6']{--bg:#10151a;--ink:#f2f5f3;--mute:#a9b6bd;--card:#1b232a;--card2:#232e36;--line:#2d3a43;--a:#c6ff4d;--hot:#ff8f84;--on:#10151a;--meX:#232e36;--rad:18px;--bw:0px;--sh:none;--glow:transparent;--font:Heebo,"Segoe UI",Arial,sans-serif}
+html[data-v='6'] body{background:#10151a;background-image:none;color:#f2f5f3;font-family:Heebo,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+[data-v='6'] .mast{border:0;padding-bottom:4px}[data-v='6'] .logo img{mix-blend-mode:normal;height:64px;border-radius:12px;background:#fff;padding:4px 8px}
+[data-v='6'] .mono{color:#a9b6bd}[data-v='6'] a{color:inherit}
+[data-v='6'] .who select{background:#1b232a;color:#f2f5f3;border:1px solid #2d3a43;border-radius:12px}
+[data-v='6'] .search{background:#1b232a;border:1px solid #2d3a43;box-shadow:none;border-radius:16px}
+[data-v='6'] .search input{color:#f2f5f3;font-weight:500;font-size:17px}[data-v='6'] .search input::placeholder{color:#7d8c95}
+[data-v='6'] .search button{background:#c6ff4d;color:#10151a;border-radius:0}[data-v='6'] .search #scan{background:#1b232a;color:#f2f5f3}
+[data-v='6'] .chip{background:#1b232a;color:#f2f5f3;border:0;border-radius:999px;padding:10px 14px;font-weight:700;min-height:40px}
+[data-v='6'] .chip[aria-pressed=true],[data-v='6'] .chip.add,[data-v='6'] .chip.go{background:#c6ff4d;color:#10151a}
+[data-v='6'] .chip.add.in-cart{background:#232e36;color:#c6ff4d}
+[data-v='6'] .hero,[data-v='6'] .hero.win{background:#1b232a;border:0;box-shadow:none}
+[data-v='6'] .hero.win{box-shadow:inset 0 0 0 2px #c6ff4d}
+[data-v='6'] .rankstamp{background:#232e36;color:#c6ff4d}
+[data-v='6'] .huge,[data-v='6'] .rw .pr{color:#c6ff4d!important}[data-v='6'] .huge.bad{color:#ff8f84!important}
+[data-v='6'] .say mark,[data-v='6'] .tg.lo,[data-v='6'] .tg.me,[data-v='6'] .hero.win .say mark{background:#1d3a2c;color:#7fe0a8!important;border:0;border-radius:7px}
+[data-v='6'] .tg{background:#3a1f1d;color:#ff8f84;border:0;border-radius:7px}[data-v='6'] .tg.an{background:#3a2a10!important;color:#ffb74d!important}
+[data-v='6'] .pod{background:#1b232a;border:0;border-radius:18px;color:#f2f5f3}[data-v='6'] .pod[aria-selected=true]{background:#232e36;box-shadow:inset 0 0 0 2px #c6ff4d;color:#f2f5f3}[data-v='6'] .pod[aria-selected=true] .no{color:#c6ff4d}
+[data-v='6'] .pod .df{color:#7fe0a8}[data-v='6'] .pod .df.up{color:#ff8f84}
+[data-v='6'] .lst{background:transparent}[data-v='6'] .rw{background:#1b232a!important;border-radius:18px;color:#f2f5f3}[data-v='6'] .rw.me{background:#232e36!important;box-shadow:inset 0 0 0 2px #c6ff4d}
+[data-v='6'] .rw.lo{box-shadow:inset 0 0 0 1px #7fe0a8}[data-v='6'] .rw.part{background:#151c21!important}
+[data-v='6'] .df.up,[data-v='6'] .up{color:#ff8f84}[data-v='6'] .df.dn,[data-v='6'] .dn{color:#7fe0a8}
+[data-v='6'] h3::after{background:#2d3a43}
+[data-v='6'] .card2,[data-v='6'] .tile,[data-v='6'] .sum,[data-v='6'] .state{background:#1b232a;border:0;border-radius:18px}[data-v='6'] .state{border:1px dashed #2d3a43;background:transparent}
+[data-v='6'] .tile{box-shadow:none}[data-v='6'] .tile.t-low{background:#1d3a2c;color:#7fe0a8}[data-v='6'] .tile.t-same{background:#232e36;color:#f2f5f3}[data-v='6'] .tile.t-warm{background:#3a2a10;color:#ffb74d}[data-v='6'] .tile.t-high{background:#3a1f1d;color:#ff8f84}[data-v='6'] .tile.t-missing{background:#151c21;color:#7d8c95}[data-v='6'] .tile.me{border-color:#c6ff4d;box-shadow:none}
+[data-v='6'] .tbl td,[data-v='6'] .tbl th,[data-v='6'] .ci,[data-v='6'] .br{border-color:#2d3a43}
+[data-v='6'] .pb,[data-v='6'] .tr{background:#2d3a43;border:0;border-radius:4px}[data-v='6'] .tr i{border-radius:4px}
+[data-v='6'] .flt select,[data-v='6'] .flt input,[data-v='6'] input:not([type=checkbox]),[data-v='6'] select,[data-v='6'] textarea{background:#1b232a;color:#f2f5f3;border:1px solid #2d3a43;border-radius:12px}
+[data-v='6'] #stale{background:#3a1f1d;color:#ff8f84;box-shadow:none;border:0;border-radius:14px}
+[data-v='6'] #offb,[data-v='6'] #miss{background:#3a2a10;color:#ffb74d}[data-v='6'] .rec{background:#232e36;color:#f2f5f3}
+[data-v='6'] #fresh,[data-v='6'] #fresh *{color:inherit}
+[data-v='6'] .toast{background:#c6ff4d;color:#10151a;bottom:calc(92px + env(safe-area-inset-bottom))}
+[data-v='6'] #cart,[data-v='6'] #sheet .box,[data-v='6'] #cmp,[data-v='6'] #cash{background:#10151a;color:#f2f5f3;border:0}[data-v='6'] .opt{background:#1b232a;border:0;border-radius:16px;box-shadow:none;color:#f2f5f3}[data-v='6'] .opt.wa{background:#25d366;color:#04200f}
+[data-v='6'] .qty{background:#232e36;border:0;border-radius:10px}[data-v='6'] .sug,[data-v='6'] .hist{background:#1b232a}
+[data-v='6'] #a11yb{background:#232e36;color:#f2f5f3;border-color:#2d3a43;bottom:calc(90px + env(safe-area-inset-bottom))}[data-v='6'] #a11yp{bottom:calc(142px + env(safe-area-inset-bottom))}
+[data-v='6'] #fresh{background:#1d3a2c!important;color:#7fe0a8!important;border-radius:14px}[data-v='6'] #fresh *{color:#7fe0a8!important;background:transparent!important}[data-v='6'] .who select{box-shadow:none}
+.homec{cursor:pointer}.homec .hh{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 12px;font:800 20px inherit;font-family:inherit;letter-spacing:0}.homec .hh::after{display:none}.homec .hh small{font-size:13px;font-weight:600;color:var(--mute)}
+.more{display:block;width:100%;padding:12px 24px;border:0;border-radius:14px;background:var(--a,#c6ff4d);color:var(--on,#10151a);font:800 16px inherit;font-family:inherit;min-height:44px;cursor:pointer}
+/* bottom bar */
+[data-v='6'] #scrnav{position:fixed;inset-inline:0;bottom:0;margin:0;z-index:50;display:flex;gap:2px;justify-content:flex-start;align-items:center;height:72px;background:#0c1115;border-top:1px solid #222c34;padding:0 6px calc(env(safe-area-inset-bottom));overflow-x:auto;scrollbar-width:none}
+[data-v='6'] #scrnav::-webkit-scrollbar{display:none}
+[data-v='6'] #scrnav .chip{background:transparent;color:#a9b6bd;border-radius:14px;min-height:52px;min-width:64px;padding:6px 8px;font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;white-space:normal;text-align:center;line-height:1.15}
+[data-v='6'] #scrnav .chip[aria-pressed=true]{background:transparent;color:#c6ff4d;font-weight:800}
+[data-v='6'] #cartbtn{bottom:calc(86px + env(safe-area-inset-bottom));background:#c6ff4d;color:#10151a;border:0;border-radius:16px;box-shadow:none}
+html[data-hc] body{background:#000}
 </style><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&family=Secular+One&family=Frank+Ruhl+Libre:wght@400;700&family=Rubik:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap"></head><body><a class="skip" href="#q">דלג לחיפוש</a>
 <div class="wrap">
   <div class="mast">
@@ -279,7 +326,7 @@ html[data-role=viewer] .mgr{display:none!important}
   <div class="toc" id="toc" role="tablist"></div>
   <div id="sug" role="listbox" aria-label="הצעות חיפוש"></div>
   <div class="fl" id="facets" aria-label="צמצום לפי מילה בשם המוצר"></div>
-  <div id="out" aria-live="polite"><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div></div>
+  <div id="out" aria-live="polite"><div class="card2 homec"><h3 class="hh"><span>🏬 כל סניפי אושר עד</span><small>מחיר מוצר ב-24 סניפים ‹</small></h3><button type="button" class="more" data-home="scan">📷 סרוק ברקוד וראה את כל הסניפים</button></div><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div></div>
 </div>
 <div id="scanner"><video playsinline muted></video><p>כוון את המצלמה אל הברקוד</p><div id="scanlog" aria-live="polite"></div><button class="chip" id="scanmode" type="button" aria-pressed="false">הוספה לסל ברצף: כבוי</button><button class="chip" id="scanx" type="button">ביטול</button></div>
 <button id="cartbtn" type="button"></button>
@@ -487,11 +534,11 @@ $('#q').oninput=()=>{clearTimeout(timer);clearTimeout(sugT);const v=$('#q').valu
 $('#sug').onclick=e=>{const b=e.target.closest('[data-code]');if(b){$('#q').value=b.dataset.code;find()}};
 function syncDiffUI(){document.querySelectorAll('[data-dir]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.dir===DIR));$('#amt').style.opacity=DIR?1:.55}
 $('#diffbar').addEventListener('click',e=>{const b=e.target.closest('[data-dir]');if(!b)return;
-  DIR=DIR===b.dataset.dir?null:b.dataset.dir;try{localStorage.o24dir=DIR||''}catch(x){}syncDiffUI();if(LAST.length)applyFilter()});
+  DIR=DIR===b.dataset.dir?null:b.dataset.dir;try{localStorage.o24dir=DIR||''}catch(x){}syncDiffUI();if(LAST.length){applyFilter();toast(DIR?(DIR==='cheaper'?'מציג מוצרים שסניפים אחרים זולים בהם ממני':'מציג מוצרים שסניפים אחרים יקרים בהם ממני'):'הסינון בוטל')}else toast(DIR?'הסינון פעיל: חפש מוצר ויוצגו רק מוצרים עם פער':'הסינון כבוי',2600)});
 $('#amt').oninput=()=>{const v=parseFloat($('#amt').value.replace(',','.'));AMT=isFinite(v)&&v>=0?v:0;try{localStorage.o24amt=AMT}catch(x){}if(DIR&&LAST.length){clearTimeout(window._at);window._at=setTimeout(applyFilter,350)}};
 try{DIR=localStorage.o24dir||null;const a=parseFloat(localStorage.o24amt);if(isFinite(a)&&a>=0){AMT=a;$('#amt').value=a}}catch(e){}
 syncDiffUI();
-$('#promoOnly').onclick=e=>{const b=e.currentTarget;b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true');if(LAST.length)applyFilter()};
+$('#promoOnly').onclick=e=>{const b=e.currentTarget,on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);if(LAST.length){applyFilter();toast(on?'מציג רק מוצרים במבצע':'מציג את כל המוצרים')}else toast(on?'הסינון פעיל: חפש מוצר ויוצגו רק מוצרים במבצע':'הסינון כבוי',2600)};
 
 /* ---------- recent searches ---------- */
 const RK='o24recent';
@@ -731,7 +778,7 @@ const MGR=()=>ME.role!=='viewer';
 function setScr(n){SCR=n;document.body.dataset.scr=n;document.querySelectorAll('#scrnav [data-scr]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.scr===n))}
 async function jget(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()}
 function noRpc(){out.innerHTML='<div class="state"><b>🔌</b>המסך הזה דורש את הפונקציות החדשות במסד הנתונים<br><span class="mono">הרץ את db/br24_readonly_rpcs.sql (ראה README)</span></div>'}
-function openScr(n,arg){setScr(n);$('#sug').innerHTML='';if(n==='search'){out.innerHTML='';if(RAW.length){LAST=mview(RAW);applyFilter()}else out.innerHTML='<div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div>';return}
+function openScr(n,arg){setScr(n);$('#sug').innerHTML='';if(n==='search'){out.innerHTML='';if(RAW.length){LAST=mview(RAW);applyFilter()}else out.innerHTML='<div class="card2 homec"><h3 class="hh"><span>🏬 כל סניפי אושר עד</span><small>מחיר מוצר ב-24 סניפים ‹</small></h3><button type="button" class="more" data-home="scan">📷 סרוק ברקוד וראה את כל הסניפים</button></div><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div>';return}
   out.innerHTML='<div class="sk"></div>';({war:scrWar,exp:scrExp,promos:scrPromos,dept:scrDept})[n](arg).catch(noRpc)}
 $('#scrnav').onclick=e=>{const b=e.target.closest('[data-scr]');if(b)openScr(b.dataset.scr)};
 async function scrWar(){
@@ -995,5 +1042,6 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   q.oninput=()=>{clearTimeout(t);t=setTimeout(go,/^\d+$/.test(q.value.trim())?150:350)};
   q.onkeydown=e=>{if(e.key==='Enter'){clearTimeout(t);go();q.select()}};
 })();
+document.addEventListener('click',e=>{const b=e.target.closest('[data-home=scan]');if(b){e.stopPropagation();const x=document.getElementById('scan');if(x)x.click()}else if(e.target.closest('.homec')){const q=document.getElementById('q');if(q)q.focus()}});
 </script>
 </body></html>
