@@ -1091,5 +1091,23 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-home=scan]
   q('#bkb').onclick=()=>{if(hd>0)history.back();else back()};
   later();
 })();
+
+(function(){
+  const st=document.createElement('style');
+  st.textContent=`.shtxt{margin-inline-start:10px;vertical-align:middle;font-size:13px}`;document.head.appendChild(st);
+  function txt(){
+    const it=VIEW[cur];if(!it||!rows||!rows.length)return '';
+    const mine=MINE(),lo=rows[0];
+    const l=rows.map((r,i)=>`${i+1}. ${nm(r.c)} · ${fmt(r.eff)}${MODE==='eff'&&r.promo?' ★':''}${r.c===mine?' (הסניף שלי)':''}`);
+    return `${it.name}\nברקוד ${it.code}\n${MODE==='eff'?'מחיר לאחר מבצעים':'מחיר מדף'} · ${rows.length} סניפים, מהזול ליקר\nהכי זול: ${nm(lo.c)} ${fmt(lo.eff)}\n\n${l.join('\n')}\n\nאושר24`}
+  async function share(){
+    const t=txt();if(!t){toast('אין מה לשתף');return}
+    try{if(navigator.share){await navigator.share({text:t});return}}catch(e){if(e&&e.name==='AbortError')return}
+    window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
+  window.__shareTxt=txt;
+  const _s=show;
+  show=function(){_s();const h=[...document.querySelectorAll('#out h3')].find(x=>x.textContent.trim()==='כל הסניפים');
+    if(h&&!h.querySelector('.shtxt')){const b=document.createElement('button');b.type='button';b.className='chip go shtxt';b.textContent='📲 שתף רשימה';b.onclick=share;h.appendChild(b)}};
+})();
 </script>
 </body></html>
