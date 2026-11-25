@@ -126,7 +126,8 @@ h3::after{content:"";flex:1;height:var(--bw);background:var(--ink)}
 .pod .df{font:800 12px var(--mono);margin-top:4px;color:#0a8a3c}.pod .df.up{color:var(--hot)}
 .pod[aria-selected=true] .df{color:var(--lime)}.pod[aria-selected=true] .df.up{color:#ff9a76}
 #recent{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 0}
-#recent .chip{font-weight:600;font-size:12px;padding:3px 10px}
+#recent .chip{font-weight:600;font-size:12px;padding:3px 10px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#recent .rdet{width:100%}#recent summary{cursor:pointer;font-weight:700;font-size:13px;padding:6px 2px;color:inherit}#recent .rl{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .lnk{background:none;border:0;padding:0;color:var(--mute);font:600 12px inherit;font-family:inherit;text-decoration:underline;cursor:pointer}
 #scanner{position:fixed;inset:0;z-index:80;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 #scanner.on{display:flex}
@@ -315,7 +316,7 @@ html[data-hc] body{background:#000}
   <div class="fl" id="modebar"><button type="button" class="chip" data-mode="eff" aria-pressed="true">כולל מבצעים</button><button type="button" class="chip" data-mode="reg" aria-pressed="false">מחיר מדף בלבד</button></div>
   <form class="search" id="f" role="search">
     <input id="q" placeholder="מה מחפשים?" inputmode="search" autocomplete="off" enterkeyhint="search">
-    <button type="button" id="scan" aria-label="סרוק ברקוד">▦</button>
+    <button type="button" id="scan" aria-label="סרוק ברקוד" title="סרוק ברקוד במצלמה"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2h6l2 2h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
     <input type="file" id="scanfile" accept="image/*" capture="environment" hidden>
     <button aria-label="חפש">←</button>
   </form>
@@ -377,6 +378,7 @@ async function fetchFind(q,lim){const r=await fetch('/api/find?q='+encodeURIComp
 async function find(){
   const q=$('#q').value.trim();
   if(q.length<2){toast('הקלד לפחות 2 תווים');return}
+  if(/^\d{8,14}$/.test(q))$('#q').value='';
   if(SCR!=='search')setScr('search');
   $('#sug').innerHTML='';
   const my=++seq;out.innerHTML='<div class="sk"></div>';
@@ -387,7 +389,7 @@ async function find(){
       if(my!==seq)return;const t=q.slice(0,-n),j2=await fetchFind(t,50);if((j2.items||[]).length){j=j2;used=t}}
     if(my!==seq)return;
     TOK=null;NAMES=j.names||NAMES;fillMine();RAW=j.items||[];LAST=mview(RAW);if(/^\d{8,14}$/.test(q)&&LAST[0])recScan(q,LAST[0].name);offBanner(used!==q&&LAST.length?'לא נמצא "'+q+'". מציג תוצאות עבור "'+used+'"':'');
-    if(LAST.length){remember(q);cachePut(q,j)}applyFilter();
+    if(LAST.length){remember(q,/^\d{8,14}$/.test(q)?LAST[0].name:q);cachePut(q,j)}applyFilter();
   }catch(e){
     if(my!==seq)return;
     const c=cacheGet(q);
@@ -546,12 +548,12 @@ $('#promoOnly').onclick=e=>{const b=e.currentTarget,on=b.getAttribute('aria-pres
 
 /* ---------- recent searches ---------- */
 const RK='o24recent';
-const recents=()=>{try{return JSON.parse(localStorage[RK]||'[]')}catch(e){return[]}};
-function remember(q){const l=[q,...recents().filter(x=>x!==q)].slice(0,8);try{localStorage[RK]=JSON.stringify(l)}catch(e){}renderRecent()}
-function renderRecent(){const l=recents();$('#recent').innerHTML=l.length?l.map(x=>`<button type="button" class="chip" data-q="${esc(x)}">${esc(x)}</button>`).join('')+'<button type="button" class="lnk" data-clear="1">נקה</button>':''}
+const recents=()=>{try{return JSON.parse(localStorage[RK]||'[]').map(x=>typeof x==='string'?{q:x,l:x}:x).filter(x=>x&&x.q&&!(x.q===x.l&&/^\d{6,}$/.test(x.q)))}catch(e){return[]}};
+function remember(q,label){const l=[{q,l:label||q},...recents().filter(x=>x.q!==q)].slice(0,5);try{localStorage[RK]=JSON.stringify(l)}catch(e){}renderRecent()}
+function renderRecent(){const l=recents(),o=$('#recent').querySelector('details')?.open;$('#recent').innerHTML=l.length?`<details class="rdet"${o?' open':''}><summary>🕘 חיפושים אחרונים (${l.length})</summary><div class="rl">${l.map(x=>`<button type="button" class="chip" data-q="${esc(x.q)}" title="${esc(x.l)}">${esc(x.l)}</button>`).join('')}<button type="button" class="lnk" data-clear="1">נקה הכל</button></div></details>`:''}
 $('#recent').onclick=e=>{
   if(e.target.dataset.clear){try{localStorage.removeItem(RK)}catch(x){}renderRecent();return}
-  const q=e.target.dataset.q;if(q){$('#q').value=q;find()}};
+  const b=e.target.closest('[data-q]');if(b){$('#q').value=b.dataset.q;find()}};
 
 /* ---------- share / export (picture for WhatsApp, PDF, Excel) ---------- */
 const X=window.OsherExport;
@@ -632,9 +634,11 @@ function act(a,btn){
   }else if(a==='share')openShare(modelFor([{...it,qty:1}]),it.name);
 }
 async function refreshCart(){
-  await Promise.all(CART.map(async i=>{try{
-    const r=await fetch('/api/find?q='+encodeURIComponent(i.code));if(!r.ok)return;
-    const f=((await r.json()).items||[]).find(x=>x.code===i.code);if(f){i.d=f.d;i.name=f.name}}catch(e){}}));
+  const codes=CART.map(i=>i.code);
+  for(let k=0;k<codes.length;k+=40){
+    try{const r=await fetch('/api/cart?codes='+codes.slice(k,k+40).map(encodeURIComponent).join(','));if(!r.ok)continue;
+      const m={};((await r.json()).items||[]).forEach(x=>{m[x.code]=x});
+      CART.forEach(i=>{const f=m[i.code];if(f){i.d=f.d;i.name=f.name}})}catch(e){}}
   saveCart();
 }
 function renderCart(){
@@ -815,10 +819,10 @@ async function expLoad(){
   if(SCR!=='exp')return;EXP.rows=EXP.rows.concat(d.rows||[]);EXP.total=d.total||0;
   $('#xl').innerHTML=EXP.rows.map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>${EXP.vs?'':'הכי זול: '}${esc(nm(r.cheapest))} ${fmt(r.cheapest_price)}${EXP.vs?' · אצלי '+fmt(r.m):''}${EXP.vs?'':' · '+r.n_cheaper+' סניפים זולים ב־₪'+EXP.c+'+'}</small></span><span class="pr">${fmt(r.m)}</span><span class="df up">+${fmt(r.m-r.cheapest_price)}</span></div>`).join('')||'<div class="state">לא נמצאו מוצרים לפי הסינון</div>';
   $('#xm').innerHTML=(d.more?'<button class="chip" id="xmore">עוד תוצאות</button> ':'')+`<span class="mono">${EXP.rows.length} מתוך ${EXP.total}</span>`;
-  $('#xact').innerHTML=EXP.rows.length&&MGR()?'<button class="chip add" id="xcart">🧺 הוסף לסל (עד 60)</button><button class="chip go" id="xxl">📊 Excel</button><button class="chip go" id="xwa">📲 וואטסאפ</button>':'';
+  $('#xact').innerHTML=EXP.rows.length&&MGR()?'<button class="chip add" id="xcart">🧺 הוסף לסל (עד 120)</button><button class="chip go" id="xxl">📊 Excel</button><button class="chip go" id="xwa">📲 וואטסאפ</button>':'';
   if($('#xmore'))$('#xmore').onclick=()=>{EXP.page++;expLoad()};
   $('#xl').onclick=e=>{const r=e.target.closest('[data-code]');if(r){$('#q').value=r.dataset.code;find()}};
-  if($('#xcart'))$('#xcart').onclick=()=>{let n=0;EXP.rows.slice(0,60).forEach(r=>{if(!inCart(r.code)){CART.push({code:r.code,name:r.name,qty:1,d:{}});n++}});saveCart();updCartBtn();toast(n?'נוספו '+n+' מוצרים לסל':'כבר בסל')};
+  if($('#xcart'))$('#xcart').onclick=()=>{let n=0;EXP.rows.slice(0,120).forEach(r=>{if(!inCart(r.code)){CART.push({code:r.code,name:r.name,qty:1,d:{}});n++}});saveCart();updCartBtn();toast(n?'נוספו '+n+' מוצרים לסל':'כבר בסל')};
   if($('#xxl'))$('#xxl').onclick=expXlsx;if($('#xwa'))$('#xwa').onclick=expWa}
 function expText(){const me=MINE();return 'איפה אני יקר · '+nm(me)+'\n'+EXP.rows.slice(0,25).map(r=>'• '+r.name+' · אצלי '+fmt(r.m)+' · הכי זול '+fmt(r.cheapest_price)+' ('+nm(r.cheapest)+')').join('\n')+(EXP.total>25?'\n…ועוד '+(EXP.total-25):'')}
 function expWa(){const t=expText();if(navigator.share)navigator.share({text:t}).catch(()=>{});else window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
@@ -868,10 +872,10 @@ async function scrDept(arg){
     EXP.rows=f;EXP.total=f.length;EXP.vs='';EXP.c=DP.min;
     $('#dl').innerHTML=f.slice(0,DP.n).map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>הכי זול: ${esc(nm(r.cheapest))} ${fmt(r.cheapest_price)} · ${r.n_cheaper} סניפים זולים ממני</small></span><span class="pr">${fmt(r.m)}</span><span class="df up">+${fmt(r.m-r.cheapest_price)}</span></div>`).join('')||'<div class="state">אין מוצרים לפי הסינון</div>';
     $('#dm').innerHTML=(f.length>DP.n?'<button class="chip" id="dmore">עוד תוצאות</button> ':'')+`<span class="mono">${Math.min(DP.n,f.length)} מתוך ${f.length} (במחלקה ${mine.length})</span>`;
-    $('#dact').innerHTML=f.length&&MGR()?'<button class="chip add" id="dcart">🧺 הוסף הכל לסל (עד 60)</button><button class="chip go" id="dxl">📊 Excel</button><button class="chip go" id="dwa">📲 וואטסאפ</button>':'';
+    $('#dact').innerHTML=f.length&&MGR()?'<button class="chip add" id="dcart">🧺 הוסף הכל לסל (עד 120)</button><button class="chip go" id="dxl">📊 Excel</button><button class="chip go" id="dwa">📲 וואטסאפ</button>':'';
     if($('#dmore'))$('#dmore').onclick=()=>{DP.n+=100;draw()};
     $('#dl').onclick=e=>{const r=e.target.closest('[data-code]');if(r){setScr('search');$('#q').value=r.dataset.code;find()}};
-    if($('#dcart'))$('#dcart').onclick=()=>{let n=0;f.slice(0,60).forEach(r=>{if(!inCart(r.code)){CART.push({code:r.code,name:r.name,qty:1,d:{}});n++}});saveCart();updCartBtn();toast(n?'נוספו '+n+' מוצרים לסל':'כבר בסל')};
+    if($('#dcart'))$('#dcart').onclick=()=>{let n=0;f.slice(0,120).forEach(r=>{if(!inCart(r.code)){CART.push({code:r.code,name:r.name,qty:1,d:{}});n++}});saveCart();updCartBtn();toast(n?'נוספו '+n+' מוצרים לסל':'כבר בסל')};
     if($('#dxl'))$('#dxl').onclick=expXlsx;if($('#dwa'))$('#dwa').onclick=expWa};
   $('#dmin').onchange=()=>{DP.min=$('#dmin').value;DP.n=100;draw()};let t;$('#dq').oninput=()=>{clearTimeout(t);t=setTimeout(()=>{DP.q=$('#dq').value.trim();DP.n=100;draw()},300)};
   $('#dback').onclick=()=>openScr('dept','');draw()}
@@ -1052,5 +1056,40 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   q.onkeydown=e=>{if(e.key==='Enter'){clearTimeout(t);go();q.select()}};
 })();
 document.addEventListener('click',e=>{const b=e.target.closest('[data-home=scan]');if(b){e.stopPropagation();const x=document.getElementById('scan');if(x)x.click()}else if(e.target.closest('.homec')){const q=document.getElementById('q');if(q)q.focus()}});
+
+(function(){
+  const st=document.createElement('style');
+  st.textContent=`#bk{position:fixed;top:0;inset-inline:0;height:52px;z-index:95;display:flex;align-items:center;padding:0 12px;background:#10151a;border-bottom:1px solid #2d3a43}#bk[hidden]{display:none}
+  #bk button{min-height:40px;padding:0 18px;border:0;border-radius:20px;background:#c6ff4d;color:#10151a;font:800 16px inherit;cursor:pointer}
+  body.hasbk{padding-top:52px}body.hasbk #cart,body.hasbk #cmp,body.hasbk #cash,body.hasbk #scanner{padding-top:52px;box-sizing:border-box}
+  .rdet summary{list-style:none}.rdet summary::-webkit-details-marker{display:none}`;
+  document.head.appendChild(st);
+  const bar=document.createElement('div');bar.id='bk';bar.hidden=true;bar.innerHTML='<button type="button" id="bkb" aria-label="חזרה">→ חזרה</button>';document.body.appendChild(bar);
+  const q=s=>document.querySelector(s);
+  const OVS=[['#cart',()=>closeCart()],['#cmp',()=>{q('#cmp').classList.remove('on');document.body.style.overflow=''}],['#sheet',()=>closeSheet()],['#cash',()=>{const b=q('#cash .ce');if(b)b.click();else q('#cash').classList.remove('on')}],['#scanner',()=>stopScan()]];
+  const z=e=>+getComputedStyle(e).zIndex||0;
+  const top=()=>{let b=null;for(const [s,f] of OVS){const e=q(s);if(e&&e.classList.contains('on')&&(!b||z(e)>=z(b.e)))b={e,f}}return b};
+  let stack=[],popping=false,viaNav=false;
+  q('#scrnav').addEventListener('click',()=>{viaNav=true;setTimeout(()=>viaNav=false,0)},true);
+  const _o=openScr;
+  openScr=function(n,arg){
+    if(!popping){if(SCR==='search')stack=[];if(n==='search')stack=[];else if(n!==SCR){if(viaNav)stack=[];else if(SCR!=='search')stack.push(SCR)}}
+    return _o(n,arg)};
+  const depth=()=>OVS.filter(([s])=>q(s)&&q(s).classList.contains('on')).length+(SCR!=='search'?1+stack.length:0)+(RAW.length?1:0);
+  function back(){
+    const t=top();if(t){t.f();return}
+    if(SCR!=='search'){const n=stack.length?stack.pop():'search';popping=true;try{openScr(n)}finally{popping=false}return}
+    if(RAW.length){RAW=[];LAST=[];VIEW=[];cur=-1;q('#q').value='';['#facets','#toc','#sug'].forEach(s=>{const e=q(s);if(e)e.innerHTML=''});openScr('search')}}
+  let hd=0,skip=0,pend=false;
+  function sync(){pend=false;const d=depth();bar.hidden=d===0;document.body.classList.toggle('hasbk',d>0);
+    if(d>hd){for(let i=hd;i<d;i++)history.pushState({o24:1},'');hd=d}
+    else if(d<hd){const n=hd-d;hd=d;skip++;history.go(-n)}}
+  const later=()=>{if(!pend){pend=true;requestAnimationFrame(sync)}};
+  new MutationObserver(later).observe(document.body,{attributes:true,subtree:true,attributeFilter:['class','data-scr']});
+  new MutationObserver(later).observe(q('#out'),{childList:true});
+  addEventListener('popstate',()=>{if(skip>0){skip--;return}if(hd>0){hd--;back();later()}});
+  q('#bkb').onclick=()=>{if(hd>0)history.back();else back()};
+  later();
+})();
 </script>
 </body></html>
