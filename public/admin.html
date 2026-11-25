@@ -61,12 +61,26 @@ async function loadPw(){
   const r=await fetch('/api/admin/pw');
   if(!r.ok){box.innerHTML='';return}
   const j=await r.json();
-  box.innerHTML=`<h3>סיסמאות סניפים</h3>${j.rows.map(x=>`<div class="pr" data-c="${esc(x.code)}"><div class="pn"><a href="/?b=${esc(x.code)}" style="color:inherit">${esc(x.name)}</a> <span class="st">${esc(x.code)}</span><div class="st ${x.custom?'c':''}">${x.custom?'שונתה '+new Date(x.at).toLocaleDateString('he-IL'):'ברירת מחדל (מספר הסניף)'}</div></div><input class="p" type="text" autocomplete="off" placeholder="סיסמה חדשה" maxlength="64"><button class="sv">שמור</button>${x.custom?'<button class="rs">איפוס</button>':''}</div>`).join('')}<div class="note">הסיסמה נשמרת מוצפנת (גיבוב) ואי אפשר להציג אותה אחר כך. שינוי מנתק את הסניף הזה מיד, ושאר הסניפים לא מושפעים. עד דקה עד שהשינוי נקלט בכל השרתים. כניסת מנהל רשת נשארת כמו שהייתה. לפחות 4 תווים.</div>`;
+  const vw=(j.viewers||[]).map(v=>`<div class="pr" data-v="${esc(v.name)}"><div class="pn">👁 ${esc(v.name)}<div class="st">צופה ללא סניף${v.at?' · נוסף '+new Date(v.at).toLocaleDateString('he-IL'):''}</div></div><button class="vd">מחק</button></div>`).join('');
+  box.innerHTML=`<h3>סיסמאות סניפים</h3>${j.rows.map(x=>`<div class="pr" data-c="${esc(x.code)}"><div class="pn"><a href="/?b=${esc(x.code)}" style="color:inherit">${esc(x.name)}</a> <span class="st">${esc(x.code)}</span><div class="st ${x.custom?'c':''}">${x.custom?'שונתה '+new Date(x.at).toLocaleDateString('he-IL'):'ברירת מחדל (מספר הסניף)'}</div></div><input class="p" type="text" autocomplete="off" placeholder="סיסמה חדשה" maxlength="64"><button class="sv">שמור</button>${x.custom?'<button class="rs">איפוס</button>':''}</div>`).join('')}<div class="note">הסיסמה נשמרת מוצפנת (גיבוב) ואי אפשר להציג אותה אחר כך. שינוי מנתק את הסניף הזה מיד, ושאר הסניפים לא מושפעים. עד דקה עד שהשינוי נקלט בכל השרתים. כניסת מנהל רשת נשארת כמו שהייתה. לפחות 4 תווים.</div>
+  <h3>צופים ללא סניף</h3>${vw||'<div class="note">עדיין אין צופים</div>'}
+  <div class="pr"><div class="pn"><input class="p" id="vnm" type="text" autocomplete="off" placeholder="שם הצופה" maxlength="24" style="width:140px"> <input class="p" id="vpw" type="text" autocomplete="off" placeholder="סיסמה" maxlength="64" style="width:110px"></div><button class="sv" id="vadd">הוסף צופה</button></div>
+  <div class="note">צופה ללא סניף רואה את כל האתר וכל 24 הסניפים, בלי סל, ייצוא או ניהול. בכניסה לאתר בוחרים "צופה ללא סניף · כל האתר" ומקלידים שם וסיסמה. מחיקה מנתקת אותו מיד. לפחות 4 תווים לסיסמה.</div>`;
   box.querySelectorAll('.pr[data-c]').forEach(tr=>{
     const c=tr.dataset.c,post=b=>fetch('/api/admin/pw',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:c,...b})});
     tr.querySelector('.sv').onclick=async()=>{const v=tr.querySelector('input').value;if(v.length<4){alert('לפחות 4 תווים');return}const r=await post({password:v});if(r.ok)loadPw();else alert('השמירה נכשלה')};
     const rs=tr.querySelector('.rs');if(rs)rs.onclick=async()=>{if(confirm('להחזיר לסיסמת ברירת המחדל (מספר הסניף)?')){const r=await post({reset:true});if(r.ok)loadPw();else alert('הפעולה נכשלה')}};
   });
+  const postV=b=>fetch('/api/admin/pw',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)});
+  box.querySelectorAll('.pr[data-v]').forEach(tr=>{
+    const n=tr.dataset.v;
+    tr.querySelector('.vd').onclick=async()=>{if(confirm('למחוק את הצופה "'+n+'"?')){const r=await postV({viewer:n,reset:true});if(r.ok)loadPw();else alert('הפעולה נכשלה')}};
+  });
+  document.getElementById('vadd').onclick=async()=>{
+    const n=document.getElementById('vnm').value.trim(),v=document.getElementById('vpw').value;
+    if(n.length<2){alert('שם קצר מדי');return}
+    if(v.length<4){alert('סיסמה: לפחות 4 תווים');return}
+    const r=await postV({viewer:n,password:v});if(r.ok)loadPw();else alert('השמירה נכשלה')};
 }
 loadPw();
 </script></body></html>
