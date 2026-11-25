@@ -293,8 +293,9 @@
     const H = head + infoH + 70 + rows.length * rowH + 110;
     const cv = doc.createElement('canvas'); cv.width = W * S; cv.height = H * S;
     const x = cv.getContext('2d'); x.scale(S, S); x.direction = 'rtl'; x.textBaseline = 'middle';
-    const T = (t, px, py, o = {}) => { x.font = font(o.size || 28, o.weight); x.fillStyle = o.color || '#111'; x.textAlign = o.align || 'right'; x.fillText(String(t), px, py); };
-    const R = (px, py, w, h, c, r) => { x.fillStyle = c; x.beginPath(); if (x.roundRect) x.roundRect(px, py, w, h, r || 0); else x.rect(px, py, w, h); x.fill(); };
+    const DK = !!m.dark, FM = { '#f2eee3': '#10151a', '#111': '#0a0e12', '#dde5ff': '#1c2a5a', '#eaffb0': '#2a3a14', '#f7f3e8': '#19222b', '#fffdf7': '#141b22', '#ece9df': '#1a222a' }, TM = { '#0a8a3c': '#4ade80', '#d9480f': '#ff7a45', '#a06800': '#f5b942', '#6d6a60': '#9aa6b0', '#2a2a2a': '#e6ebef', '#8a8a80': '#8d99a3' };
+    const T = (t, px, py, o = {}) => { x.font = font(o.size || 28, o.weight); x.fillStyle = DK ? (o.color ? (TM[o.color] || o.color) : '#eef2f5') : (o.color || '#111'); x.textAlign = o.align || 'right'; x.fillText(String(t), px, py); };
+    const R = (px, py, w, h, c, r) => { x.fillStyle = DK ? (FM[c] || c) : c; x.beginPath(); if (x.roundRect) x.roundRect(px, py, w, h, r || 0); else x.rect(px, py, w, h); x.fill(); };
     R(0, 0, W, H, '#f2eee3');
     // header band
     R(0, 0, W, head - 30, '#111');
@@ -354,7 +355,7 @@
       if (sub) T(sub, W - P - 76, y + 46, { size: 17, color: r.promo ? '#a06800' : '#8a8a80', weight: r.promo ? 700 : 400 });
       const col = ok ? priceColor(hi > lo ? (val - lo) / (hi - lo) : 0) : '#8a8a80';
       T(ok ? fmt(val) : '—', 560, y + 28, { size: 30, weight: 900, color: col, align: 'center' });
-      let d = '', dc = '#111';
+      let d = '', dc = DK ? '#cfd6dc' : '#111';
       if (basket) { if (ok && r.rank > 1) { d = '+' + fmt(val - lo); dc = '#d9480f'; } else if (ok) { d = 'הכי זול'; dc = '#0a8a3c'; } }
       else if (myRow && !isMine) { const df = r.eff - myRow.eff; if (Math.abs(df) > .004) { d = (df < 0 ? '−' : '+') + fmt(Math.abs(df)); dc = df < 0 ? '#0a8a3c' : '#d9480f'; } else d = '='; }
       else if (isMine) d = 'אני';

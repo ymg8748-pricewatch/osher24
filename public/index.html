@@ -1101,6 +1101,17 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-home=scan]
     const l=rows.map((r,i)=>`${i+1}. ${nm(r.c)} · ${fmt(r.eff)}${MODE==='eff'&&r.promo?' ★':''}${r.c===mine?' (הסניף שלי)':''}`);
     return `${it.name}\nברקוד ${it.code}\n${MODE==='eff'?'מחיר לאחר מבצעים':'מחיר מדף'} · ${rows.length} סניפים, מהזול ליקר\nהכי זול: ${nm(lo.c)} ${fmt(lo.eff)}\n\n${l.join('\n')}\n\nאושר24`}
   async function share(){
+    const it=VIEW[cur];if(!it||!rows||!rows.length){toast('אין מה לשתף');return}
+    {const mm=modelFor([{...it,qty:1}]);mm.dark=true;openShare(mm,it.name)}
+    const x=sbox.querySelector('[data-sh=xlsx]'),c=sbox.querySelector('[data-sh=copy]');
+    if(c)c.remove();
+    if(x){x.dataset.sh='txt';x.querySelector('.ic').textContent='💬';x.querySelector('span:last-child').innerHTML='טקסט<small>רשימה קצרה להדבקה בהודעה</small>'}}
+  const _ds=doShare;
+  doShare=async function(k){if(k==='txt'){const t=txt();closeSheet();if(!t)return;
+    try{if(navigator.share){await navigator.share({text:t});return}}catch(e){if(e&&e.name==='AbortError')return}
+    window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');return}
+    return _ds(k)};
+  async function shareOld(){
     const t=txt();if(!t){toast('אין מה לשתף');return}
     try{if(navigator.share){await navigator.share({text:t});return}}catch(e){if(e&&e.name==='AbortError')return}
     window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
