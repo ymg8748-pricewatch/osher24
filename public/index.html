@@ -791,16 +791,35 @@ function noRpc(){out.innerHTML='<div class="state"><b>🔌</b>המסך הזה ד
 function openScr(n,arg){setScr(n);$('#sug').innerHTML='';if(n==='search'){out.innerHTML='';if(RAW.length){LAST=mview(RAW);applyFilter()}else out.innerHTML='<div class="card2 homec"><h3 class="hh"><span>🏬 כל סניפי אושר עד</span><small>מחיר מוצר ב-24 סניפים ‹</small></h3><button type="button" class="more" data-home="scan">📷 סרוק ברקוד וראה את כל הסניפים</button></div><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div>';return}
   out.innerHTML='<div class="sk"></div>';({war:scrWar,exp:scrExp,promos:scrPromos,dept:scrDept})[n](arg).catch(noRpc)}
 $('#scrnav').onclick=e=>{const b=e.target.closest('[data-scr]');if(b)openScr(b.dataset.scr)};
+let WAR={d:''};try{WAR.d=(JSON.parse(localStorage.o24war||'{}').d)||''}catch(e){}
 async function scrWar(){
-  const me=MINE(),d=await jget('/api/war?me='+me+'&mode='+MODE);if(SCR!=='war')return;
+  const me=MINE(),C=DEPT.C||(DEPT.C=await import('/classify.js'));
+  const dsel=`<div class="flt" style="margin-bottom:8px"><div><label for="wdept">מחלקה</label><select id="wdept"><option value="">כל המחלקות</option>${C.DEPTS.map(x=>`<option value="${esc(x)}"${x===WAR.d?' selected':''}>${esc(x)}</option>`).join('')}</select></div></div>`;
+  const wire=()=>{const s=$('#wdept');if(s)s.onchange=()=>{WAR.d=s.value;try{localStorage.o24war=JSON.stringify({d:WAR.d})}catch(e){}out.innerHTML='<div class="sk"></div>';scrWar().catch(warDeptErr)}};
+  let d,noteDept='';
+  if(WAR.d){
+    const cat=await deptLoad();if(SCR!=='war')return;
+    const codes=cat.filter(r=>r.dept===WAR.d).map(r=>r.code);
+    if(!codes.length){out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2>${dsel}<div class="state">אין מוצרים במחלקה ${esc(WAR.d)}</div></div>`;wire();return}
+    noteDept=` · מחלקה: ${esc(WAR.d)} (${codes.length} מוצרים)`;
+    try{
+      const r=await fetch('/api/war?mode='+MODE,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({codes})});
+      if(!r.ok)throw new Error(r.status);d=await r.json();
+    }catch(e){warDeptErr();return}
+  }else{
+    d=await jget('/api/war?me='+me+'&mode='+MODE);
+  }
+  if(SCR!=='war')return;
   const rs=(d.rows||[]).map(r=>({...r,q:(r.cheaper-r.pricier)/Math.max(1,r.n)})).sort((a,b)=>b.avg_gap-a.avg_gap);
-  if(!rs.length){out.innerHTML='<div class="state">אין נתונים להשוואה</div>';return}
+  if(!rs.length){out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2>${dsel}<div class="state">אין נתונים להשוואה</div></div>`;wire();return}
   let W=0,L=0,T=0;rs.forEach(r=>{if(r.q>.05)W++;else if(r.q<-.05)L++;else T++});
-  out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2><div class="note">${esc(nm(me))} מול כל סניפי אושר עד, על מוצרים משותפים · ניצחתי ${W} · הפסדתי ${L} · תיקו ${T}</div>
+  out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2>${dsel}<div class="note">${esc(nm(me))} מול כל סניפי אושר עד, על מוצרים משותפים${noteDept} · ניצחתי ${W} · הפסדתי ${L} · תיקו ${T}</div>
   ${rs.map(r=>{const t=Math.max(1,r.n),a=Math.round(r.cheaper/t*100),b=Math.round(r.pricier/t*100);return `<div class="vs" data-vs="${r.br}"><div><div>אני</div><div class="pb"><i style="width:${a}%;background:#12c26b"></i></div><b>${a}% זול</b></div><div><div>${esc(nm(r.br))}</div><div class="pb" style="direction:ltr"><i style="width:${b}%;background:#ff3b30"></i></div><b>${b}% זול</b></div></div>`}).join('')}</div>
   <div class="card2"><b>הפער מול כל סניף</b> <span class="note">חיובי = אני זול יותר (ממוצע %)</span><table class="tbl"><tr><th>סניף</th><th>זול</th><th>שווה</th><th>יקר</th><th>פער</th></tr>${rs.map(r=>`<tr data-vs="${r.br}"><td>${esc(nm(r.br))}</td><td class="dn">${r.cheaper}</td><td>${r.equal}</td><td class="up">${r.pricier}</td><td dir="ltr" class="${r.avg_gap>=0?'dn':'up'}">${r.avg_gap>=0?'+':''}${r.avg_gap.toFixed(1)}%</td></tr>`).join('')}</table></div>
   <div class="note">לחיצה על סניף: המוצרים שבהם אני יקר ממנו</div>`;
+  wire();
   out.querySelectorAll('[data-vs]').forEach(x=>x.onclick=()=>{EXP.vs=x.dataset.vs;EXP.page=0;openScr('exp')})}
+function warDeptErr(){out.innerHTML='<div class="card2"><h2>מלחמת סניפים</h2><div class="state"><b>🔌</b>סינון המלחמה לפי מחלקה דורש פונקציית מסד חדשה<br><span class="mono">הרץ את db/br24_war_dept.sql (ראה README)</span></div></div>'}
 let EXP={vs:'',c:'1',p:'0',sort:'gap',q:'',page:0,rows:[],total:0};try{Object.assign(EXP,JSON.parse(localStorage.o24exp||'{}'),{page:0,rows:[]})}catch(e){}
 async function scrExp(){
   const me=MINE(),sel=(id,lab,opts,cur)=>`<div><label for="${id}">${lab}</label><select id="${id}">${opts.map(([v,l])=>`<option value="${v}" ${String(cur)===String(v)?'selected':''}>${l}</option>`).join('')}</select></div>`;
@@ -1009,20 +1028,31 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   /* 9. two branches side by side (over the current search results and the basket) */
   const cmp=document.createElement('div');cmp.id='cmp';cmp.setAttribute('role','dialog');cmp.setAttribute('aria-label','השוואת שני סניפים');document.body.appendChild(cmp);
   const btn=document.createElement('button');btn.type='button';btn.className='chip';btn.setAttribute('aria-pressed','false');btn.textContent='⚖️ השוואת שני סניפים';nav.appendChild(btn);
-  let CA=null,CB=null;
-  function drawCmp(){
+  let CA=null,CB=null,CM={d:'',g:'0'},CMC=null;
+  async function drawCmp(){
     const codes=Object.keys(NAMES).sort((a,b)=>nm(a).localeCompare(nm(b),'he'));CA=CA||MINE();CB=CB||codes.find(c=>c!==CA);
     const pool=new Map();for(const it of [...(LAST||[]),...CART])pool.set(it.code,it);
-    const rows=[];let a=0,b=0,e=0,sa=0,sb=0;
-    for(const it of pool.values()){const d=mvd(it.d),x=d[CA],y=d[CB];if(!x||!y)continue;const diff=x[1]-y[1];rows.push({n:it.name,x:x[1],y:y[1],diff});if(diff<-.004)a++;else if(diff>.004)b++;else e++;sa+=x[1];sb+=y[1]}
+    if(!CMC){try{CMC=await import('/classify.js')}catch(e){}}
+    const rows=[];
+    for(const it of pool.values()){const d=mvd(it.d),x=d[CA],y=d[CB];if(!x||!y)continue;rows.push({n:it.name,x:x[1],y:y[1],diff:x[1]-y[1],dept:CMC?CMC.classify(it.name,null,false):null})}
     rows.sort((p,q)=>Math.abs(q.diff)-Math.abs(p.diff));
+    const g=+CM.g||0,frows=rows.filter(r=>(!CM.d||r.dept===CM.d)&&Math.abs(r.diff)>=g-0.004);
+    let a=0,b=0,e=0,sa=0,sb=0;for(const r of frows){if(r.diff<-.004)a++;else if(r.diff>.004)b++;else e++;sa+=r.x;sb+=r.y}
     const opt=s=>codes.map(c=>`<option value="${c}" ${c===s?'selected':''}>${esc(nm(c))}</option>`).join('');
+    const depts=CMC?CMC.DEPTS.filter(d=>rows.some(r=>r.dept===d)):[];
+    const flt=rows.length?`<div style="display:flex;gap:8px;margin-top:8px"><select id="cmdept" aria-label="מחלקה" style="flex:1"><option value="">כל המחלקות</option>${depts.map(d=>`<option value="${esc(d)}" ${d===CM.d?' selected':''}>${esc(d)}</option>`).join('')}</select><select id="cmgap" aria-label="פער מינימלי">${[['0','כל פער'],['0.5','פער ₪0.5+'],['1','פער ₪1+'],['2','פער ₪2+'],['5','פער ₪5+'],['10','פער ₪10+']].map(([v,l])=>`<option value="${v}" ${CM.g===v?' selected':''}>${l}</option>`).join('')}</select></div>`:'';
+    const filtNote=(CM.d||g>0)?' (מסונן)':'';
     cmp.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">השוואת שני סניפים</h2><button class="chip" id="cmpx">סגור ✕</button></div>
     <div style="display:flex;gap:8px;align-items:center;margin-top:10px"><select id="ca" aria-label="סניף א">${opt(CA)}</select><span>מול</span><select id="cb" aria-label="סניף ב">${opt(CB)}</select></div>
+    ${flt}
     ${CA===MINE()?`<button type="button" class="chip go" id="cmpall" style="margin-top:10px">📋 כל המוצרים: ${esc(nm(CB))} זול ממני ב-₪1/2/5/10</button>`:''}
-    ${rows.length?`<div class="avg"><b>${esc(nm(CA))}</b> זול ב-${a} מוצרים · <b>${esc(nm(CB))}</b> זול ב-${b} · שווים ב-${e}<br>סכום המוצרים (${rows.length}): ${fmt(sa)} מול ${fmt(sb)} · ${sa===sb?'שווה':sa<sb?`<span class="win">${esc(nm(CA))} זול ב-${fmt(sb-sa)}</span>`:`<span class="win">${esc(nm(CB))} זול ב-${fmt(sa-sb)}</span>`}</div>
-    <table><tr><th>מוצר</th><th>${esc(nm(CA))}</th><th>${esc(nm(CB))}</th><th>פער</th></tr>${rows.slice(0,60).map(r=>`<tr><td>${esc(r.n)}</td><td class="n ${r.diff<-.004?'win':''}">${fmt(r.x)}</td><td class="n ${r.diff>.004?'win':''}">${fmt(r.y)}</td><td class="n">${Math.abs(r.diff)<.005?'—':(r.diff>0?'+':'−')+fmt(Math.abs(r.diff))}</td></tr>`).join('')}</table>`
+    ${rows.length?(frows.length?`<div class="avg"><b>${esc(nm(CA))}</b> זול ב-${a} מוצרים · <b>${esc(nm(CB))}</b> זול ב-${b} · שווים ב-${e}<br>סכום המוצרים (${frows.length}${filtNote?' מתוך '+rows.length:''}): ${fmt(sa)} מול ${fmt(sb)} · ${sa===sb?'שווה':sa<sb?`<span class="win">${esc(nm(CA))} זול ב-${fmt(sb-sa)}</span>`:`<span class="win">${esc(nm(CB))} זול ב-${fmt(sa-sb)}</span>`}</div>
+    <table><tr><th>מוצר</th><th>${esc(nm(CA))}</th><th>${esc(nm(CB))}</th><th>פער</th></tr>${frows.slice(0,60).map(r=>`<tr><td>${esc(r.n)}</td><td class="n ${r.diff<-.004?'win':''}">${fmt(r.x)}</td><td class="n ${r.diff>.004?'win':''}">${fmt(r.y)}</td><td class="n">${Math.abs(r.diff)<.005?'—':(r.diff>0?'+':'−')+fmt(Math.abs(r.diff))}</td></tr>`).join('')}</table>`
+    :'<div class="state">אין מוצרים לפי הסינון</div>')
     :'<div class="state"><b>⚖️</b>אין מוצרים להשוואה<br><span class="mono">חפש מוצרים או הוסף לסל, וחזור לכאן. ההשוואה היא על התוצאות הנוכחיות והסל.</span></div>'}`;
+    const cd=cmp.querySelector('#cmdept'),cg=cmp.querySelector('#cmgap');
+    if(cd)cd.onchange=()=>{CM.d=cd.value;drawCmp()};
+    if(cg)cg.onchange=()=>{CM.g=cg.value;drawCmp()};
     if(cmp.querySelector('#cmpall'))cmp.querySelector('#cmpall').onclick=()=>{EXP.vs=CB;EXP.page=0;cmp.classList.remove('on');document.body.style.overflow='';openScr('exp')};
     cmp.querySelector('#cmpx').onclick=()=>{cmp.classList.remove('on');document.body.style.overflow=''};
     cmp.querySelector('#ca').onchange=e=>{CA=e.target.value;drawCmp()};cmp.querySelector('#cb').onchange=e=>{CB=e.target.value;drawCmp()};
