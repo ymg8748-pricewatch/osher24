@@ -833,16 +833,18 @@ function pairCard(me){
   <div class="flt" style="margin-top:8px"><div><label for="pwa">סניף א</label><select id="pwa"${pwFree()?'':' disabled'}>${opt(PW.a,'')}</select></div>
   <div><label for="pwb">סניף ב</label><select id="pwb">${opt(PW.b,PW.a)}</select></div>
   <div><label for="pwd">מחלקה</label><select id="pwd"><option value="">כל המחלקות</option>${dl}</select></div>
-  <div><label for="pwg">פער מינימלי (₪)</label><input id="pwg" type="number" inputmode="decimal" min="0.01" step="any" value="${esc(PW.g)}"></div></div>
-  <div class="acts" id="pwch" style="margin-top:8px"><span class="note">פער מינימלי:</span>${[['0.1','10 אג׳'],['0.2','20 אג׳'],['0.3','30 אג׳'],['1','₪1'],['2','₪2'],['3','₪3'],['4','₪4'],['5','₪5']].map(([v,l])=>`<button type="button" class="chip${+PW.g===+v?' on':''}" data-pg="${v}" aria-pressed="${+PW.g===+v}">${l}</button>`).join('')}</div>
+  <div style="position:relative"><label for="pwg">פער מינימלי (₪)</label><div style="display:flex;gap:6px"><input id="pwg" type="number" inputmode="decimal" min="0.01" step="any" value="${esc(PW.g)}" placeholder="הקלד או בחר" style="flex:1;min-width:0"><button type="button" class="chip" id="pwdd" aria-label="הצעות לפער" aria-expanded="false">▾</button></div>
+  <ul id="pwl" hidden role="listbox" style="position:absolute;inset-inline:0;top:100%;z-index:30;margin:4px 0 0;padding:4px;list-style:none;background:#1b242c;border:1px solid #2d3a43;border-radius:12px;box-shadow:0 8px 24px #0008">${[['0.1','10 אגורות'],['0.2','20 אגורות'],['0.3','30 אגורות'],['1','₪1'],['2','₪2'],['3','₪3'],['4','₪4'],['5','₪5']].map(([v,l])=>`<li role="option" data-pg="${v}" style="padding:10px 12px;cursor:pointer;border-radius:8px">${l}</li>`).join('')}</ul></div></div>
   <div class="acts" style="margin-top:8px"><button type="button" class="chip go" id="pwgo">⚔️ השווה</button></div><div id="pwr" style="margin-top:10px">${PW.res||''}</div></div>`}
 function pairWire(){
   const g=i=>document.getElementById(i);if(!g('pw'))return;
   g('pwa').onchange=()=>{PW.a=g('pwa').value;if(PW.b===PW.a)PW.b='';PW.res=null;scrWar().catch(noRpc)};
   g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.res=null;g('pwr').innerHTML=''};
   g('pwd').onchange=()=>{PW.d=g('pwd').value};
-  document.querySelectorAll('#pwch [data-pg]').forEach(x=>x.onclick=()=>{g('pwg').value=x.dataset.pg;PW.g=x.dataset.pg;document.querySelectorAll('#pwch [data-pg]').forEach(y=>{const on=y===x;y.classList.toggle('on',on);y.setAttribute('aria-pressed',on)});pairRun()});
-  g('pwg').oninput=()=>{document.querySelectorAll('#pwch [data-pg]').forEach(y=>{const on=+y.dataset.pg===+g('pwg').value;y.classList.toggle('on',on);y.setAttribute('aria-pressed',on)})};
+  const lst=g('pwl'),tg=()=>{lst.hidden=!lst.hidden;g('pwdd').setAttribute('aria-expanded',!lst.hidden)};
+  g('pwdd').onclick=e=>{e.stopPropagation();tg()};
+  lst.onclick=e=>{const x=e.target.closest('[data-pg]');if(!x)return;g('pwg').value=x.dataset.pg;PW.g=x.dataset.pg;lst.hidden=true;g('pwdd').setAttribute('aria-expanded','false');pairRun()};
+  document.addEventListener('click',e=>{if(!lst.hidden&&!e.target.closest('#pwl'))lst.hidden=true});
   g('pwgo').onclick=pairRun}
 async function pairRun(){
   const box=document.getElementById('pwr');if(!box||PW.busy)return;
