@@ -834,12 +834,15 @@ function pairCard(me){
   <div><label for="pwb">סניף ב</label><select id="pwb">${opt(PW.b,PW.a)}</select></div>
   <div><label for="pwd">מחלקה</label><select id="pwd"><option value="">כל המחלקות</option>${dl}</select></div>
   <div><label for="pwg">פער מינימלי (₪)</label><input id="pwg" type="number" inputmode="decimal" min="0.01" step="any" value="${esc(PW.g)}"></div></div>
+  <div class="acts" id="pwch" style="margin-top:8px"><span class="note">פער מינימלי:</span>${[['0.1','10 אג׳'],['0.2','20 אג׳'],['0.3','30 אג׳'],['1','₪1'],['2','₪2'],['3','₪3'],['4','₪4'],['5','₪5']].map(([v,l])=>`<button type="button" class="chip${+PW.g===+v?' on':''}" data-pg="${v}" aria-pressed="${+PW.g===+v}">${l}</button>`).join('')}</div>
   <div class="acts" style="margin-top:8px"><button type="button" class="chip go" id="pwgo">⚔️ השווה</button></div><div id="pwr" style="margin-top:10px">${PW.res||''}</div></div>`}
 function pairWire(){
   const g=i=>document.getElementById(i);if(!g('pw'))return;
   g('pwa').onchange=()=>{PW.a=g('pwa').value;if(PW.b===PW.a)PW.b='';PW.res=null;scrWar().catch(noRpc)};
   g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.res=null;g('pwr').innerHTML=''};
   g('pwd').onchange=()=>{PW.d=g('pwd').value};
+  document.querySelectorAll('#pwch [data-pg]').forEach(x=>x.onclick=()=>{g('pwg').value=x.dataset.pg;PW.g=x.dataset.pg;document.querySelectorAll('#pwch [data-pg]').forEach(y=>{const on=y===x;y.classList.toggle('on',on);y.setAttribute('aria-pressed',on)});pairRun()});
+  g('pwg').oninput=()=>{document.querySelectorAll('#pwch [data-pg]').forEach(y=>{const on=+y.dataset.pg===+g('pwg').value;y.classList.toggle('on',on);y.setAttribute('aria-pressed',on)})};
   g('pwgo').onclick=pairRun}
 async function pairRun(){
   const box=document.getElementById('pwr');if(!box||PW.busy)return;
