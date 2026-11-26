@@ -813,12 +813,56 @@ async function scrWar(){
   const rs=(d.rows||[]).map(r=>({...r,q:(r.cheaper-r.pricier)/Math.max(1,r.n)})).sort((a,b)=>b.avg_gap-a.avg_gap);
   if(!rs.length){out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2>${dsel}<div class="state">אין נתונים להשוואה</div></div>`;wire();return}
   let W=0,L=0,T=0;rs.forEach(r=>{if(r.q>.05)W++;else if(r.q<-.05)L++;else T++});
-  out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2>${dsel}<div class="note">${esc(nm(me))} מול כל סניפי אושר עד, על מוצרים משותפים${noteDept} · ניצחתי ${W} · הפסדתי ${L} · תיקו ${T}</div>
+  out.innerHTML=pairCard(me)+`<div class="card2"><h2>מלחמת סניפים</h2>${dsel}<div class="note">${esc(nm(me))} מול כל סניפי אושר עד, על מוצרים משותפים${noteDept} · ניצחתי ${W} · הפסדתי ${L} · תיקו ${T}</div>
   ${rs.map(r=>{const t=Math.max(1,r.n),a=Math.round(r.cheaper/t*100),b=Math.round(r.pricier/t*100);return `<div class="vs" data-vs="${r.br}"><div><div>אני</div><div class="pb"><i style="width:${a}%;background:#12c26b"></i></div><b>${a}% זול</b></div><div><div>${esc(nm(r.br))}</div><div class="pb" style="direction:ltr"><i style="width:${b}%;background:#ff3b30"></i></div><b>${b}% זול</b></div></div>`}).join('')}</div>
   <div class="card2"><b>הפער מול כל סניף</b> <span class="note">חיובי = אני זול יותר (ממוצע %)</span><table class="tbl"><tr><th>סניף</th><th>זול</th><th>שווה</th><th>יקר</th><th>פער</th></tr>${rs.map(r=>`<tr data-vs="${r.br}"><td>${esc(nm(r.br))}</td><td class="dn">${r.cheaper}</td><td>${r.equal}</td><td class="up">${r.pricier}</td><td dir="ltr" class="${r.avg_gap>=0?'dn':'up'}">${r.avg_gap>=0?'+':''}${r.avg_gap.toFixed(1)}%</td></tr>`).join('')}</table></div>
   <div class="note">לחיצה על סניף: המוצרים שבהם אני יקר ממנו</div>`;
-  wire();
+  wire();pairWire();
   out.querySelectorAll('[data-vs]').forEach(x=>x.onclick=()=>{EXP.vs=x.dataset.vs;EXP.page=0;openScr('exp')})}
+
+/* ---------- war: branch vs branch + department + free gap ---------- */
+let PW={a:'',b:'',d:'',g:'1',res:null,busy:false};
+const pwFree=()=>ME.role==='admin'||(ME.role==='viewer'&&!ME.branch);
+function pairCard(me){
+  if(!PW.a||!pwFree())PW.a=me;
+  const codes=Object.keys(NAMES).sort((x,y)=>nm(x).localeCompare(nm(y),'he'));
+  if(!PW.b||PW.b===PW.a)PW.b=codes.find(c=>c!==PW.a)||'';
+  const C=DEPT.C,opt=(sel,skip)=>codes.filter(c=>c!==skip).map(c=>`<option value="${c}"${c===sel?' selected':''}>${esc(nm(c))}</option>`).join('');
+  const dl=(C?C.DEPTS:[]).map(x=>`<option value="${esc(x)}"${x===PW.d?' selected':''}>${esc(x)}</option>`).join('');
+  return `<div class="card2" id="pw"><h2>סניף מול סניף</h2><div class="note">בחר שני סניפים, מחלקה וסכום פער חופשי</div>
+  <div class="flt" style="margin-top:8px"><div><label for="pwa">סניף א</label><select id="pwa"${pwFree()?'':' disabled'}>${opt(PW.a,'')}</select></div>
+  <div><label for="pwb">סניף ב</label><select id="pwb">${opt(PW.b,PW.a)}</select></div>
+  <div><label for="pwd">מחלקה</label><select id="pwd"><option value="">כל המחלקות</option>${dl}</select></div>
+  <div><label for="pwg">פער מינימלי (₪)</label><input id="pwg" type="number" inputmode="decimal" min="0.01" step="any" value="${esc(PW.g)}"></div></div>
+  <div class="acts" style="margin-top:8px"><button type="button" class="chip go" id="pwgo">⚔️ השווה</button></div><div id="pwr" style="margin-top:10px">${PW.res||''}</div></div>`}
+function pairWire(){
+  const g=i=>document.getElementById(i);if(!g('pw'))return;
+  g('pwa').onchange=()=>{PW.a=g('pwa').value;if(PW.b===PW.a)PW.b='';PW.res=null;scrWar().catch(noRpc)};
+  g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.res=null;g('pwr').innerHTML=''};
+  g('pwd').onchange=()=>{PW.d=g('pwd').value};
+  g('pwgo').onclick=pairRun}
+async function pairRun(){
+  const box=document.getElementById('pwr');if(!box||PW.busy)return;
+  PW.d=document.getElementById('pwd').value;PW.g=document.getElementById('pwg').value;PW.b=document.getElementById('pwb').value;
+  const gap=Math.max(0.01,+PW.g||0.01),A=PW.a,B=PW.b,both=pwFree();
+  if(!A||!B||A===B){box.innerHTML='<div class="state">בחר שני סניפים שונים</div>';return}
+  PW.busy=true;box.innerHTML='<div class="sk"></div>';
+  try{
+    const C=DEPT.C||(DEPT.C=await import('/classify.js'));
+    const load=async(me,vs)=>{let rows=[],pg=0;for(;pg<40;pg++){const d=await jget(`/api/exp?me=${me}&vs=${vs}&minc=${gap}&minp=0&sort=gap&mode=${MODE}&page=${pg}`);rows=rows.concat(d.rows||[]);if(!d.more)break}
+      return {rows:rows.filter(r=>!PW.d||C.classify(r.name,null,false)===PW.d),cut:pg>=40}};
+    const [ra,rb]=await Promise.all([load(A,B),both?load(B,A):Promise.resolve(null)]);
+    const side=(r,name,other,flip)=>r.rows.length?`<table class="tbl"><tr><th>מוצר</th><th>${esc(nm(A))}</th><th>${esc(nm(B))}</th><th>פער</th></tr>${r.rows.slice(0,60).map(x=>{const pa=flip?x.cheapest_price:x.m,pb=flip?x.m:x.cheapest_price;return `<tr><td>${esc(x.name)}</td><td class="n">${fmt(pa)}</td><td class="n">${fmt(pb)}</td><td class="n">${fmt(Math.abs(pa-pb))}</td></tr>`}).join('')}</table>${r.rows.length>60?`<div class="note">מוצגים 60 הראשונים מתוך ${r.rows.length}</div>`:''}`:'<div class="state">אין מוצרים לפי הסינון</div>';
+    const sum=(r)=>r.rows.reduce((t,x)=>t+(x.m-x.cheapest_price),0);
+    const dn=PW.d?` · מחלקה: ${esc(PW.d)}`:'';
+    box.innerHTML=`<div class="note">פער של ₪${gap}+${dn}</div>
+    <div class="avg"><b>${esc(nm(A))}</b> יקר מ-<b>${esc(nm(B))}</b> ב-${ra.rows.length} מוצרים${rb?` · <b>${esc(nm(B))}</b> יקר מ-<b>${esc(nm(A))}</b> ב-${rb.rows.length}`:''}</div>
+    <h3 style="margin:12px 0 4px">${esc(nm(A))} יקר יותר (${ra.rows.length})</h3>${side(ra)}
+    ${rb?`<h3 style="margin:12px 0 4px">${esc(nm(B))} יקר יותר (${rb.rows.length})</h3>${side(rb,0,0,true)}`:'<div class="note">הצגת הכיוון ההפוך זמינה למנהל רשת בלבד</div>'}
+    ${(ra.cut||(rb&&rb.cut))?'<div class="note">התוצאות קוצרו. הגדל את הפער.</div>':''}`;
+    PW.res=box.innerHTML;
+  }catch(e){box.innerHTML='<div class="state">שגיאה בהשוואה, נסה שוב</div>'}
+  PW.busy=false}
 function warDeptErr(){out.innerHTML='<div class="card2"><h2>מלחמת סניפים</h2><div class="state"><b>🔌</b>סינון המלחמה לפי מחלקה דורש פונקציית מסד חדשה<br><span class="mono">הרץ את db/br24_war_dept.sql (ראה README)</span></div></div>'}
 let EXP={vs:'',c:'1',p:'0',sort:'gap',q:'',page:0,rows:[],total:0};try{Object.assign(EXP,JSON.parse(localStorage.o24exp||'{}'),{page:0,rows:[]})}catch(e){}
 async function scrExp(){
