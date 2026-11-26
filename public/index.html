@@ -791,16 +791,35 @@ function noRpc(){out.innerHTML='<div class="state"><b>🔌</b>המסך הזה ד
 function openScr(n,arg){setScr(n);$('#sug').innerHTML='';if(n==='search'){out.innerHTML='';if(RAW.length){LAST=mview(RAW);applyFilter()}else out.innerHTML='<div class="card2 homec"><h3 class="hh"><span>🏬 כל סניפי אושר עד</span><small>מחיר מוצר ב-24 סניפים ‹</small></h3><button type="button" class="more" data-home="scan">📷 סרוק ברקוד וראה את כל הסניפים</button></div><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div>';return}
   out.innerHTML='<div class="sk"></div>';({war:scrWar,exp:scrExp,promos:scrPromos,dept:scrDept})[n](arg).catch(noRpc)}
 $('#scrnav').onclick=e=>{const b=e.target.closest('[data-scr]');if(b)openScr(b.dataset.scr)};
+let WAR={d:''};try{WAR.d=(JSON.parse(localStorage.o24war||'{}').d)||''}catch(e){}
 async function scrWar(){
-  const me=MINE(),d=await jget('/api/war?me='+me+'&mode='+MODE);if(SCR!=='war')return;
+  const me=MINE(),C=DEPT.C||(DEPT.C=await import('/classify.js'));
+  const dsel=`<div class="flt" style="margin-bottom:8px"><div><label for="wdept">מחלקה</label><select id="wdept"><option value="">כל המחלקות</option>${C.DEPTS.map(x=>`<option value="${esc(x)}"${x===WAR.d?' selected':''}>${esc(x)}</option>`).join('')}</select></div></div>`;
+  const wire=()=>{const s=$('#wdept');if(s)s.onchange=()=>{WAR.d=s.value;try{localStorage.o24war=JSON.stringify({d:WAR.d})}catch(e){}out.innerHTML='<div class="sk"></div>';scrWar().catch(warDeptErr)}};
+  let d,noteDept='';
+  if(WAR.d){
+    const cat=await deptLoad();if(SCR!=='war')return;
+    const codes=cat.filter(r=>r.dept===WAR.d).map(r=>r.code);
+    if(!codes.length){out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2>${dsel}<div class="state">אין מוצרים במחלקה ${esc(WAR.d)}</div></div>`;wire();return}
+    noteDept=` · מחלקה: ${esc(WAR.d)} (${codes.length} מוצרים)`;
+    try{
+      const r=await fetch('/api/war?mode='+MODE,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({codes})});
+      if(!r.ok)throw new Error(r.status);d=await r.json();
+    }catch(e){warDeptErr();return}
+  }else{
+    d=await jget('/api/war?me='+me+'&mode='+MODE);
+  }
+  if(SCR!=='war')return;
   const rs=(d.rows||[]).map(r=>({...r,q:(r.cheaper-r.pricier)/Math.max(1,r.n)})).sort((a,b)=>b.avg_gap-a.avg_gap);
-  if(!rs.length){out.innerHTML='<div class="state">אין נתונים להשוואה</div>';return}
+  if(!rs.length){out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2>${dsel}<div class="state">אין נתונים להשוואה</div></div>`;wire();return}
   let W=0,L=0,T=0;rs.forEach(r=>{if(r.q>.05)W++;else if(r.q<-.05)L++;else T++});
-  out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2><div class="note">${esc(nm(me))} מול כל סניפי אושר עד, על מוצרים משותפים · ניצחתי ${W} · הפסדתי ${L} · תיקו ${T}</div>
+  out.innerHTML=`<div class="card2"><h2>מלחמת סניפים</h2>${dsel}<div class="note">${esc(nm(me))} מול כל סניפי אושר עד, על מוצרים משותפים${noteDept} · ניצחתי ${W} · הפסדתי ${L} · תיקו ${T}</div>
   ${rs.map(r=>{const t=Math.max(1,r.n),a=Math.round(r.cheaper/t*100),b=Math.round(r.pricier/t*100);return `<div class="vs" data-vs="${r.br}"><div><div>אני</div><div class="pb"><i style="width:${a}%;background:#12c26b"></i></div><b>${a}% זול</b></div><div><div>${esc(nm(r.br))}</div><div class="pb" style="direction:ltr"><i style="width:${b}%;background:#ff3b30"></i></div><b>${b}% זול</b></div></div>`}).join('')}</div>
   <div class="card2"><b>הפער מול כל סניף</b> <span class="note">חיובי = אני זול יותר (ממוצע %)</span><table class="tbl"><tr><th>סניף</th><th>זול</th><th>שווה</th><th>יקר</th><th>פער</th></tr>${rs.map(r=>`<tr data-vs="${r.br}"><td>${esc(nm(r.br))}</td><td class="dn">${r.cheaper}</td><td>${r.equal}</td><td class="up">${r.pricier}</td><td dir="ltr" class="${r.avg_gap>=0?'dn':'up'}">${r.avg_gap>=0?'+':''}${r.avg_gap.toFixed(1)}%</td></tr>`).join('')}</table></div>
   <div class="note">לחיצה על סניף: המוצרים שבהם אני יקר ממנו</div>`;
+  wire();
   out.querySelectorAll('[data-vs]').forEach(x=>x.onclick=()=>{EXP.vs=x.dataset.vs;EXP.page=0;openScr('exp')})}
+function warDeptErr(){out.innerHTML='<div class="card2"><h2>מלחמת סניפים</h2><div class="state"><b>🔌</b>סינון המלחמה לפי מחלקה דורש פונקציית מסד חדשה<br><span class="mono">הרץ את db/br24_war_dept.sql (ראה README)</span></div></div>'}
 let EXP={vs:'',c:'1',p:'0',sort:'gap',q:'',page:0,rows:[],total:0};try{Object.assign(EXP,JSON.parse(localStorage.o24exp||'{}'),{page:0,rows:[]})}catch(e){}
 async function scrExp(){
   const me=MINE(),sel=(id,lab,opts,cur)=>`<div><label for="${id}">${lab}</label><select id="${id}">${opts.map(([v,l])=>`<option value="${v}" ${String(cur)===String(v)?'selected':''}>${l}</option>`).join('')}</select></div>`;
