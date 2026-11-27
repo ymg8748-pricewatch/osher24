@@ -5,6 +5,7 @@ import { overrides, bust, hashPw } from '../../_pw.js';
 
 // Network manager only. GET: which branches have a custom password. POST {code, password} sets it; POST {code, reset:true} returns the branch to its default.
 const guard = data => (data.role === 'admin' ? null : json({ error: 'forbidden' }, 403));
+const sameOrigin = r => { const o = r.headers.get('origin'); return !o || o === new URL(r.url).origin; };
 
 export async function onRequestGet({ env, data }) {
   const g = guard(data); if (g) return g;
@@ -14,6 +15,7 @@ export async function onRequestGet({ env, data }) {
 }
 export async function onRequestPost({ request, env, data }) {
   const g = guard(data); if (g) return g;
+  if (!sameOrigin(request)) return json({ error: 'origin' }, 403);
   let b; try { b = await request.json(); } catch (e) { return json({ error: 'bad' }, 400); }
   if (b.viewer !== undefined) { // viewer with no branch: code "vw:<name>" in the same table, hash only
     const name = String(b.viewer || '').trim();
@@ -39,5 +41,6 @@ export async function onRequestPost({ request, env, data }) {
     }
   } catch (e) { console.error('pw save failed', String(e)); return json({ error: 'db' }, 502); }
   bust();
+  console.warn('admin password change', JSON.stringify({ target: b.code }));
   return json({ ok: true });
 }
