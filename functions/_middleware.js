@@ -11,7 +11,7 @@ import { overrides, hashPw } from './_pw.js';
 
 const enc = new TextEncoder();
 const TTL = 365 * 86400; // session length, seconds (renewed on every visit to the home page)
-const PUBLIC = new Set(['/manifest.webmanifest', '/sw.js', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/logo.png']);
+const PUBLIC = new Set(['/manifest.webmanifest', '/sw.js', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/logo.png', '/notice.js', '/privacy', '/terms', '/accessibility', '/privacy.html', '/terms.html', '/accessibility.html']);
 const MAX_FAILS = 8, WINDOW = 900; // login failures per IP per 15 minutes (needs KV)
 
 async function hmac(secret, msg) {
@@ -49,13 +49,29 @@ function page(err, chosen, codes, vname) {
 <button style="width:100%;padding:12px;font:900 18px inherit;background:#c9ff2f;border:2px solid #111;cursor:pointer">כניסה</button>
 <script>(function(){var b=document.getElementById('brsel'),v=document.getElementById('vnrow'),k=document.getElementById('kindrow');function t(){var w=b.value==='w';v.style.display=w?'':'none';k.style.display=w?'none':''}b.addEventListener('change',t);t()})()</script>
 ${err ? '<p style="color:#c0310a;font-weight:700;margin:12px 0 0">סניף או סיסמה שגויים</p>' : ''}
-</form></body></html>`, { status: 401, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
+</form>
+<p style="max-width:340px;margin:14px auto 0;text-align:center;font-size:13px;line-height:1.7;color:#6d6a60">הכניסה מהווה הסכמה ל<a href="/terms" style="color:#2447ff">תנאי השימוש</a> ול<a href="/privacy" style="color:#2447ff">מדיניות הפרטיות</a> · <a href="/accessibility" style="color:#2447ff">נגישות</a></p><script src="/notice.js" defer></script></body></html>`, { status: 401, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
 }
 
 const tooMany = () => new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><body dir="rtl" style="font-family:system-ui;padding:20vh 20px;text-align:center"><h2>יותר מדי ניסיונות</h2><p>נסה שוב בעוד 15 דקות.</p></body>', { status: 429, headers: { 'content-type': 'text/html; charset=utf-8', 'retry-after': String(WINDOW), 'cache-control': 'no-store' } });
 
+const SEC = {
+  'strict-transport-security': 'max-age=31536000; includeSubDomains',
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'referrer-policy': 'strict-origin-when-cross-origin',
+  'permissions-policy': 'camera=(self), microphone=(), geolocation=(), payment=(), usb=()',
+  // Report-Only first: check the browser console for violations, then rename the header to enforce.
+  'content-security-policy-report-only': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; font-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+};
 export async function onRequest(ctx) {
-  const { request, env, next, data } = ctx;
+  const res = await handle(ctx), out = new Response(res.body, res);
+  for (const [k, v] of Object.entries(SEC)) out.headers.set(k, v);
+  return out;
+}
+
+async function handle(ctx) {
+  const { request, env, next, data, waitUntil } = ctx;
   const admin = env.ADMIN_PASSWORD || env.SITE_PASSWORD || '';
   let pw = {};
   try { pw = JSON.parse(env.BRANCH_PASSWORDS || '{}'); } catch (e) { return new Response('bad BRANCH_PASSWORDS', { status: 503 }); }
@@ -92,10 +108,15 @@ export async function onRequest(ctx) {
     if (!ok) {
       console.warn('login failed', JSON.stringify({ role: role.slice(0, 8), ip }));
       if (env.KV) { try { await env.KV.put(rlKey, String(fails + 1), { expirationTtl: WINDOW }); } catch (e) { console.error('rl write failed', String(e)); } }
+      if (fails + 1 === MAX_FAILS && env.ALERT_WEBHOOK && waitUntil) { // suspicious activity: one alert when an IP gets locked out
+        const text = 'אושר24: ' + MAX_FAILS + ' ניסיונות כניסה כושלים מכתובת ' + ip + ' (נעילה ל-15 דקות)';
+        waitUntil(fetch(env.ALERT_WEBHOOK, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, content: text }) }).catch(() => {}));
+      }
       await new Promise(r => setTimeout(r, 700));
       return page(true, chosen || role, codes, chosen === 'w' ? String(f.get('vname') || '').trim().slice(0, 24) : '');
     }
     if (env.KV && fails) { try { await env.KV.delete(rlKey); } catch (e) {} }
+    if (role === 'admin') console.warn('admin login', JSON.stringify({ ip }));
     const payload = `${role}.${Math.floor(Date.now() / 1000) + TTL}`;
     const sig = await hmac(env.COOKIE_SECRET, payload + ':' + real);
     return new Response(null, { status: 303, headers: { location: '/', 'set-cookie': `o24=${payload}.${sig}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${TTL}` } });
@@ -111,6 +132,7 @@ export async function onRequest(ctx) {
       data.role = role === 'admin' ? 'admin' : role[0] === 'v' || role.startsWith('w:') ? 'viewer' : 'branch';
       data.branch = role === 'admin' || role.startsWith('w:') ? null : role.replace(/^v/, '');
       if (role.startsWith('w:')) data.vname = wmap[role].slice(3);
+      if (/^\/admin(\.html)?\/?$/.test(url.pathname) && data.role !== 'admin') return new Response(null, { status: 303, headers: { location: '/' } });
       const res = await next();
       if (url.pathname === '/' && request.method === 'GET') { // keep the session alive: a new year from every visit
         const exp2 = Math.floor(Date.now() / 1000) + TTL, out = new Response(res.body, res);
