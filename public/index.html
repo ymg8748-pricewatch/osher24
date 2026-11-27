@@ -296,7 +296,7 @@ html[data-v='6'] body{background:#10151a;background-image:none;color:#f2f5f3;fon
 [data-v='6'] #scrnav .chip[aria-pressed=true]{background:transparent;color:#c6ff4d;font-weight:800}
 [data-v='6'] #cartbtn{bottom:calc(86px + env(safe-area-inset-bottom));background:#c6ff4d;color:#10151a;border:0;border-radius:16px;box-shadow:none}
 html[data-hc] body{background:#000}
-</style><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&family=Secular+One&family=Frank+Ruhl+Libre:wght@400;700&family=Rubik:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap"></head><body><a class="skip" href="#q">דלג לחיפוש</a>
+</style><link rel="stylesheet" href="/vendor/heebo.css"></head><body><a class="skip" href="#q">דלג לחיפוש</a>
 <div class="wrap">
   <div class="mast">
     <div class="logo"><img src="/logo.png" alt="השוואת מחירים"></div>
@@ -333,6 +333,7 @@ html[data-hc] body{background:#000}
   <div class="fl" id="facets" aria-label="צמצום לפי מילה בשם המוצר"></div>
   <div id="out" aria-live="polite"><div class="card2 homec"><h3 class="hh"><span>🏬 כל סניפי אושר עד</span><small>מחיר מוצר ב-24 סניפים ‹</small></h3><button type="button" class="more" data-home="scan">📷 סרוק ברקוד וראה את כל הסניפים</button></div><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div></div>
 </div>
+<footer style="max-width:780px;margin:18px auto 0;padding:0 14px;text-align:center;font-size:13px;line-height:1.7;color:#a9b6bd"><div>המחירים מקובצי שקיפות המחירים של הסניפים, ייתכנו הבדלים בחנות. האתר עצמאי ואינו מטעם רשת אושר עד.</div><nav aria-label="מידע משפטי"><a href="/privacy" style="color:#c6ff4d">פרטיות</a> · <a href="/terms" style="color:#c6ff4d">תנאי שימוש</a> · <a href="/accessibility" style="color:#c6ff4d">נגישות</a></nav></footer>
 <div id="scanner"><video playsinline muted></video><p>כוון את המצלמה אל הברקוד</p><div id="scanlog" aria-live="polite"></div><button class="chip" id="scanmode" type="button" aria-pressed="false">הוספה לסל ברצף: כבוי</button><button class="chip" id="scanx" type="button">ביטול</button></div>
 <button id="cartbtn" type="button"></button>
 <div id="cart"><div class="in-wrap"></div></div>
@@ -558,7 +559,7 @@ $('#recent').onclick=e=>{
 /* ---------- share / export (picture for WhatsApp, PDF, Excel) ---------- */
 const X=window.OsherExport;
 const XLSX_MIME='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-const EXJS='https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
+const EXJS='/vendor/exceljs.min.js';
 let exP=null;
 const loadEx=()=>exP||(exP=new Promise((ok,no)=>{if(window.ExcelJS)return ok(window.ExcelJS);
   const sc=document.createElement('script');sc.src=EXJS;sc.onload=()=>ok(window.ExcelJS);sc.onerror=()=>{exP=null;no(new Error('exceljs'))};document.head.appendChild(sc)}));
@@ -687,7 +688,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape'){if(sheet.classList.contains(
 /* ---------- barcode scanner ----------
    Live camera when possible (native BarcodeDetector, otherwise the ZXing library loaded on demand, which also works on iPhone).
    If the camera is blocked or unavailable, a photo of the barcode is taken/picked instead. */
-const ZX_URL='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';
+const ZX_URL='/vendor/zxing.min.js';
 let stream=null,scanning=false,zxP=null,zxReader=null,bd=null;
 const loadZX=()=>zxP||(zxP=new Promise((ok,no)=>{
   if(window.ZXing)return ok(window.ZXing);
@@ -1332,6 +1333,5 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-home=scan]
     if(h&&!h.querySelector('.shtxt')){const b=document.createElement('button');b.type='button';b.className='chip go shtxt';b.textContent='📲 שתף רשימה';b.onclick=share;h.appendChild(b)}};
 })();
 </script>
-</body></html>
-
+<script src="/notice.js" defer></script></body></html>
 
