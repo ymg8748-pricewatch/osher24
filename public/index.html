@@ -235,7 +235,7 @@ html[data-hc] .chip,html[data-hc] .search,html[data-hc] select,html[data-hc] inp
 body[data-scr]:not([data-scr=search]) .sonly,body[data-scr]:not([data-scr=search]) #toc{display:none!important}
 html[data-role=viewer] .mgr{display:none!important}
 #scrnav{margin:10px 0 0;overflow-x:auto;flex-wrap:nowrap}#scrnav .chip{white-space:nowrap}
-#modebar{margin-top:8px}#miss{display:none;margin:8px 0;padding:8px 12px;border-radius:12px;background:#ffe9c9;color:#5a3a00;font-weight:700;font-size:14px}#miss.on{display:block}
+#modebar{margin-top:8px}#pwtog{display:none}body[data-scr=war] #pwtog{display:inline-flex}#pwtog[aria-expanded=true]{background:var(--lime,#c6ff4d);color:#10151a}#pw.cl{background:none;border:0;padding:0}#miss{display:none;margin:8px 0;padding:8px 12px;border-radius:12px;background:#ffe9c9;color:#5a3a00;font-weight:700;font-size:14px}#miss.on{display:block}
 .card2{border:var(--bw,1px) solid var(--line,#ddd);background:var(--card);border-radius:var(--rad,14px);padding:14px;margin-top:12px}
 .card2 h2{margin:0 0 4px;font-size:20px}.vs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;cursor:pointer;align-items:center}
 .pb{height:10px;border-radius:6px;background:var(--line,#ddd);overflow:hidden}.pb i{display:block;height:100%}.vs b{display:block;font-size:13px;margin-top:3px}
@@ -376,7 +376,7 @@ body.hasbk #sbar{top:52px}
     <button type="button" class="chip px" data-scr="exp" aria-pressed="false" tabindex="-1" aria-hidden="true">איפה אני יקר</button>
     <button type="button" class="chip px" data-scr="promos" aria-pressed="false" tabindex="-1" aria-hidden="true">מבצעים</button>
   </nav>
-  <div class="fl" id="modebar"><button type="button" class="chip" data-mode="eff" aria-pressed="true">כולל מבצעים</button><button type="button" class="chip" data-mode="reg" aria-pressed="false">מחיר מדף בלבד</button></div>
+  <div class="fl" id="modebar"><button type="button" class="chip" data-mode="eff" aria-pressed="true">כולל מבצעים</button><button type="button" class="chip" data-mode="reg" aria-pressed="false">מחיר מדף בלבד</button><button type="button" class="chip" id="pwtog" aria-expanded="false" aria-controls="pwbody" aria-label="בחירת סניפים להשוואה">⚙️ בחירה</button></div>
   <div id="sbar"><form class="search" id="f" role="search">
     <input id="q" placeholder="מה מחפשים?" inputmode="search" autocomplete="off" enterkeyhint="search">
     <button type="button" id="scan" aria-label="סרוק ברקוד" title="סרוק ברקוד במצלמה"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2h6l2 2h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
@@ -912,6 +912,7 @@ function pwLoad(){try{const x=JSON.parse(localStorage.getItem(PWK)||'null');if(!
 const PPK='osher24.pw.pairs';
 function pwPairs(){try{const x=JSON.parse(localStorage.getItem(PPK)||'[]');return [x[0]||null,x[1]||null]}catch(e){return [null,null]}}
 function pwApplyPair(p){if(pwFree()&&NAMES[p.a])PW.a=p.a;if(NAMES[p.b])PW.b=p.b;PW.d=p.d||'';PW.g=String(p.g||'1');PW.promo=!!p.promo;PW.data=null;pwSave()}
+let PWOPEN=false;
 function pairCard(me){
   if(!PW.loaded){PW.loaded=1;pwLoad()}
   if(!PW.a||!pwFree())PW.a=me;
@@ -919,7 +920,7 @@ function pairCard(me){
   if(!PW.b||PW.b===PW.a)PW.b=codes.find(c=>c!==PW.a)||'';
   const C=DEPT.C,opt=(sel,skip)=>codes.filter(c=>c!==skip).map(c=>`<option value="${c}"${c===sel?' selected':''}>${esc(nm(c))}</option>`).join('');
   const dl=(C?C.DEPTS:[]).map(x=>`<option value="${esc(x)}"${x===PW.d?' selected':''}>${esc(x)}</option>`).join('');
-  return `<div class="card2" id="pw"><h2>סניף מול סניף</h2><div class="note">בחר שני סניפים, מחלקה וסכום פער חופשי</div>
+  return `<div class="card2${PWOPEN?'':' cl'}" id="pw"><div id="pwbody"${PWOPEN?'':' hidden'}><h2>סניף מול סניף</h2><div class="note">בחר שני סניפים, מחלקה וסכום פער חופשי</div>
   <div id="pwtc" class="avg" style="margin-top:8px" hidden></div>
   <div class="flt" style="margin-top:8px"><div><label for="pwa">סניף א</label><select id="pwa"${pwFree()?'':' disabled'}>${opt(PW.a,'')}</select></div>
   <div><label for="pwb">סניף ב</label><select id="pwb">${opt(PW.b,PW.a)}</select></div>
@@ -929,9 +930,11 @@ function pairCard(me){
   <label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="pwpr"${PW.promo?' checked':''}> מבצעים בלבד (מוצר שיש עליו מבצע באחד הסניפים)</label>
   <div class="acts" style="margin-top:8px" id="pwmode"><button type="button" class="chip" data-pwm="eff" aria-pressed="${MODE==='eff'}">כולל מבצעים</button><button type="button" class="chip" data-pwm="reg" aria-pressed="${MODE==='reg'}">מחיר מדף</button></div>
   <div class="acts" style="margin-top:8px" id="pwslots">${[0,1].map(i=>{const p=pwPairs()[i];return `<button type="button" class="chip" data-slot="${i}"${p?'':' disabled'}>⭐ ${p?esc(nm(p.a))+' מול '+esc(nm(p.b)):'זוג '+(i+1)+' (ריק)'}</button><button type="button" class="chip" data-save="${i}" aria-label="שמור בזוג ${i+1}">💾 שמור כזוג ${i+1}</button>`}).join('')}</div>
-  <div class="acts" style="margin-top:8px"><button type="button" class="chip go" id="pwgo">⚔️ השווה</button>${pwFree()?'<button type="button" class="chip go" id="pwmiss">🔍 מוצרים שחסרים באחד הסניפים</button>':''}<button type="button" class="chip" id="pwclr">🧹 נקה שמורה</button></div><div class="note" style="margin-top:6px">הבחירה האחרונה נשמרת רק בדפדפן הזה</div><div id="pwr" style="margin-top:10px"></div><div id="pwm" style="margin-top:10px"></div></div>`}
+  <div class="acts" style="margin-top:8px"><button type="button" class="chip go" id="pwgo">⚔️ השווה</button>${pwFree()?'<button type="button" class="chip go" id="pwmiss">🔍 מוצרים שחסרים באחד הסניפים</button>':''}<button type="button" class="chip" id="pwclr">🧹 נקה שמורה</button></div><div class="note" style="margin-top:6px">הבחירה האחרונה נשמרת רק בדפדפן הזה</div></div><div id="pwr" style="margin-top:10px"></div><div id="pwm" style="margin-top:10px"></div></div>`}
 function pairWire(){
   const g=i=>document.getElementById(i);if(!g('pw'))return;
+  g('pwtog').setAttribute('aria-expanded',PWOPEN);
+  g('pwtog').onclick=()=>{PWOPEN=!PWOPEN;g('pwbody').hidden=!PWOPEN;g('pw').classList.toggle('cl',!PWOPEN);g('pwtog').setAttribute('aria-expanded',PWOPEN)};
   g('pwa').onchange=()=>{PW.a=g('pwa').value;if(PW.b===PW.a)PW.b='';PW.data=null;pwSave();scrWar().catch(noRpc)};
   g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.data=null;pwTopHide();g('pwr').innerHTML='';g('pwm').innerHTML='';pwSave()};
   g('pwd').onchange=()=>{PW.d=g('pwd').value;pwSave()};
