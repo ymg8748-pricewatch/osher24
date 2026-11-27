@@ -1,7 +1,6 @@
-/* Entry notice: a modal that must be approved before using the site. Approval is kept in localStorage until NOTICE_V changes. */
+/* Entry notice: a modal shown on every page load. Nothing is stored in the browser. */
 (function () {
-  var NOTICE_V = '2026-11-27', KEY = 'osher24.notice';
-  try { var o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && o.v === NOTICE_V) return; } catch (e) {}
+  var NOTICE_V = '2026-11-27';
   var P = [
     'אתר זה הוקם כפרויקט אישי לצורכי תחביב בלבד, והוא אינו אתר רשמי של אושר עד או של רשת אחרת. שמות ומותגים שייכים לבעליהם.',
     'הנתונים באתר, ובכלל זה מחירים, מבצעים ומלאי, נלקטים אוטומטית מקבצי השקיפות הפומביים שהרשתות מפרסמות, ועלולים להיות חלקיים, לא מעודכנים או שגויים. המחיר בחנות הוא המחיר המחייב.',
@@ -33,7 +32,6 @@
     d.appendChild(t);
     var f = document.createElement('div'); f.className = 'f';
     var b = document.createElement('button'); b.type = 'button'; b.textContent = 'אישור והמשך'; f.appendChild(b);
-    var s = document.createElement('div'); s.className = 's'; s.textContent = 'האישור נשמר במכשיר הזה עד שהנוסח ישתנה'; f.appendChild(s);
     d.appendChild(f); ov.appendChild(d);
     var others = [].slice.call(document.body.children), prevOverflow = document.documentElement.style.overflow;
     others.forEach(function (e) { e.inert = true; });
@@ -48,7 +46,6 @@
     }
     document.addEventListener('keydown', trap, true);
     b.onclick = function () {
-      try { localStorage.setItem(KEY, JSON.stringify({ v: NOTICE_V, t: new Date().toISOString() })); } catch (e) {}
       document.removeEventListener('keydown', trap, true);
       others.forEach(function (e) { e.inert = false; });
       document.documentElement.style.overflow = prevOverflow;

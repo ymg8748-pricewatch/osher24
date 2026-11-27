@@ -1,7 +1,7 @@
 <!doctype html>
 <html data-v="6" lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#10151a">
+<meta name="theme-color" content="#10151a" id="tc"><script>(function(){var r=document.documentElement,mq=matchMedia("(prefers-color-scheme: light)");function ap(){var p="dark";try{p=localStorage.o24theme||"dark"}catch(e){}var t=p==="auto"?(mq.matches?"light":"dark"):p;r.dataset.theme=t;var m=document.getElementById("tc");if(m)m.content=t==="light"?"#f3f6f4":"#10151a"}window.o24theme=ap;ap();if(mq.addEventListener)mq.addEventListener("change",ap)})()</script>
 <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials">
 <link rel="apple-touch-icon" href="/icon-192.png"><link rel="icon" href="/icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="אושר24">
 <title>אושר24 · מי הכי זול?</title>
@@ -50,6 +50,7 @@ button{font-family:inherit;color:inherit}
 .hero{border:var(--bw) solid var(--ink);background:var(--card);box-shadow:var(--sh);padding:16px 16px 18px;position:relative;overflow:hidden}
 .hero.win{background:var(--lime)}
 .hero .pn{font-weight:800;font-size:17px;line-height:1.25;max-width:80%}
+.cpb{margin-inline-start:6px;padding:4px 10px;min-height:30px;border:1px solid #2d3a43;border-radius:8px;background:#1b242c;color:inherit;font-size:14px;line-height:1;cursor:pointer;vertical-align:middle}.cpb:active{background:#2d3a43}
 .code{font:12px var(--mono);color:var(--mute);background:none;border:0;padding:0;cursor:pointer;direction:ltr;unicode-bidi:isolate}
 .kick{margin-top:16px}
 .huge{justify-content:flex-end;font-weight:900;font-size:clamp(76px,25vw,150px);line-height:.85;letter-spacing:-.07em;margin:2px 0 8px;display:flex;align-items:baseline;gap:6px}
@@ -247,55 +248,115 @@ html[data-role=viewer] .mgr{display:none!important}
 .note{font-size:13px;color:var(--mute);margin-top:8px}
 
 /* ---- PriceWatch look (same palette, cards, bottom bar and fonts as the old site) ---- */
-html:root[data-v='6']{--bg:#10151a;--ink:#f2f5f3;--mute:#a9b6bd;--card:#1b232a;--card2:#232e36;--line:#2d3a43;--a:#c6ff4d;--hot:#ff8f84;--on:#10151a;--meX:#232e36;--rad:18px;--bw:0px;--sh:none;--glow:transparent;--font:Heebo,"Segoe UI",Arial,sans-serif}
-html[data-v='6'] body{background:#10151a;background-image:none;color:#f2f5f3;font-family:Heebo,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+html:root[data-v='6']{--bg:#10151a;--ink:#f2f5f3;--mute:#a9b6bd;--card:#1b232a;--card2:#232e36;--line:#2d3a43;--a:#c6ff4d;--hot:#ff8f84;--on:#10151a;--meX:#232e36;--rad:18px;--bw:0px;--sh:none;--glow:transparent;--font:Heebo,"Segoe UI",Arial,sans-serif;--ok:#7fe0a8;--okbg:#1d3a2c;--badbg:#3a1f1d;--warnbg:#3a2a10;--warn:#ffb74d;--navbg:#0c1115;--navline:#222c34;--partbg:#151c21;--ph:#7d8c95}
+html[data-v='6'] body{background:var(--bg);background-image:none;color:var(--ink);font-family:Heebo,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:calc(86px + env(safe-area-inset-bottom))}
 [data-v='6'] .mast{border:0;padding-bottom:4px}[data-v='6'] .logo img{mix-blend-mode:normal;height:64px;border-radius:12px;background:#fff;padding:4px 8px}
-[data-v='6'] .mono{color:#a9b6bd}[data-v='6'] a{color:inherit}
-[data-v='6'] .who select{background:#1b232a;color:#f2f5f3;border:1px solid #2d3a43;border-radius:12px}
-[data-v='6'] .search{background:#1b232a;border:1px solid #2d3a43;box-shadow:none;border-radius:16px}
-[data-v='6'] .search input{color:#f2f5f3;font-weight:500;font-size:17px}[data-v='6'] .search input::placeholder{color:#7d8c95}
-[data-v='6'] .search button{background:#c6ff4d;color:#10151a;border-radius:0}[data-v='6'] .search #scan{background:#1b232a;color:#f2f5f3}
-[data-v='6'] .chip{background:#1b232a;color:#f2f5f3;border:0;border-radius:999px;padding:10px 14px;font-weight:700;min-height:40px}
-[data-v='6'] .chip[aria-pressed=true],[data-v='6'] .chip.add,[data-v='6'] .chip.go{background:#c6ff4d;color:#10151a}
-[data-v='6'] .chip.add.in-cart{background:#232e36;color:#c6ff4d}
-[data-v='6'] .hero,[data-v='6'] .hero.win{background:#1b232a;border:0;box-shadow:none}
-[data-v='6'] .hero.win{box-shadow:inset 0 0 0 2px #c6ff4d}
-[data-v='6'] .rankstamp{background:#232e36;color:#c6ff4d}
-[data-v='6'] .huge,[data-v='6'] .rw .pr{color:#c6ff4d!important}[data-v='6'] .huge.bad{color:#ff8f84!important}
-[data-v='6'] .say mark,[data-v='6'] .tg.lo,[data-v='6'] .tg.me,[data-v='6'] .hero.win .say mark{background:#1d3a2c;color:#7fe0a8!important;border:0;border-radius:7px}
-[data-v='6'] .tg{background:#3a1f1d;color:#ff8f84;border:0;border-radius:7px}[data-v='6'] .tg.an{background:#3a2a10!important;color:#ffb74d!important}
-[data-v='6'] .pod{background:#1b232a;border:0;border-radius:18px;color:#f2f5f3}[data-v='6'] .pod[aria-selected=true]{background:#232e36;box-shadow:inset 0 0 0 2px #c6ff4d;color:#f2f5f3}[data-v='6'] .pod[aria-selected=true] .no{color:#c6ff4d}
-[data-v='6'] .pod .df{color:#7fe0a8}[data-v='6'] .pod .df.up{color:#ff8f84}
-[data-v='6'] .lst{background:transparent}[data-v='6'] .rw{background:#1b232a!important;border-radius:18px;color:#f2f5f3}[data-v='6'] .rw.me{background:#232e36!important;box-shadow:inset 0 0 0 2px #c6ff4d}
-[data-v='6'] .rw.lo{box-shadow:inset 0 0 0 1px #7fe0a8}[data-v='6'] .rw.part{background:#151c21!important}
-[data-v='6'] .df.up,[data-v='6'] .up{color:#ff8f84}[data-v='6'] .df.dn,[data-v='6'] .dn{color:#7fe0a8}
-[data-v='6'] h3::after{background:#2d3a43}
-[data-v='6'] .card2,[data-v='6'] .tile,[data-v='6'] .sum,[data-v='6'] .state{background:#1b232a;border:0;border-radius:18px}[data-v='6'] .state{border:1px dashed #2d3a43;background:transparent}
-[data-v='6'] .tile{box-shadow:none}[data-v='6'] .tile.t-low{background:#1d3a2c;color:#7fe0a8}[data-v='6'] .tile.t-same{background:#232e36;color:#f2f5f3}[data-v='6'] .tile.t-warm{background:#3a2a10;color:#ffb74d}[data-v='6'] .tile.t-high{background:#3a1f1d;color:#ff8f84}[data-v='6'] .tile.t-missing{background:#151c21;color:#7d8c95}[data-v='6'] .tile.me{border-color:#c6ff4d;box-shadow:none}
-[data-v='6'] .tbl td,[data-v='6'] .tbl th,[data-v='6'] .ci,[data-v='6'] .br{border-color:#2d3a43}
-[data-v='6'] .pb,[data-v='6'] .tr{background:#2d3a43;border:0;border-radius:4px}[data-v='6'] .tr i{border-radius:4px}
-[data-v='6'] .flt select,[data-v='6'] .flt input,[data-v='6'] input:not([type=checkbox]),[data-v='6'] select,[data-v='6'] textarea{background:#1b232a;color:#f2f5f3;border:1px solid #2d3a43;border-radius:12px}
-[data-v='6'] #stale{background:#3a1f1d;color:#ff8f84;box-shadow:none;border:0;border-radius:14px}
-[data-v='6'] #offb,[data-v='6'] #miss{background:#3a2a10;color:#ffb74d}[data-v='6'] .rec{background:#232e36;color:#f2f5f3}
+[data-v='6'] .mono{color:var(--mute)}[data-v='6'] a{color:inherit}
+[data-v='6'] .who select{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px}
+[data-v='6'] .search{background:var(--card);border:1px solid var(--line);box-shadow:none;border-radius:16px}
+[data-v='6'] .search input{color:var(--ink);font-weight:500;font-size:17px}[data-v='6'] .search input::placeholder{color:var(--ph)}
+[data-v='6'] .search button{background:var(--a);color:var(--on);border-radius:0}[data-v='6'] .search #scan{background:var(--card);color:var(--ink)}
+[data-v='6'] .chip{background:var(--card);color:var(--ink);border:0;border-radius:999px;padding:10px 14px;font-weight:700;min-height:40px}
+[data-v='6'] .chip[aria-pressed=true],[data-v='6'] .chip.add,[data-v='6'] .chip.go{background:var(--a);color:var(--on)}
+[data-v='6'] .chip.add.in-cart{background:var(--card2);color:var(--a)}
+[data-v='6'] .hero,[data-v='6'] .hero.win{background:var(--card);border:0;box-shadow:none}
+[data-v='6'] .hero.win{box-shadow:inset 0 0 0 2px var(--a)}
+[data-v='6'] .rankstamp{background:var(--card2);color:var(--a)}
+[data-v='6'] .huge,[data-v='6'] .rw .pr{color:var(--a)!important}[data-v='6'] .huge.bad{color:var(--hot)!important}
+[data-v='6'] .say mark,[data-v='6'] .tg.lo,[data-v='6'] .tg.me,[data-v='6'] .hero.win .say mark{background:var(--okbg);color:var(--ok)!important;border:0;border-radius:7px}
+[data-v='6'] .tg{background:var(--badbg);color:var(--hot);border:0;border-radius:7px}[data-v='6'] .tg.an{background:var(--warnbg)!important;color:var(--warn)!important}
+[data-v='6'] .pod{background:var(--card);border:0;border-radius:18px;color:var(--ink)}[data-v='6'] .pod[aria-selected=true]{background:var(--card2);box-shadow:inset 0 0 0 2px var(--a);color:var(--ink)}[data-v='6'] .pod[aria-selected=true] .no{color:var(--a)}
+[data-v='6'] .pod .df{color:var(--ok)}[data-v='6'] .pod .df.up{color:var(--hot)}
+[data-v='6'] .lst{background:transparent}[data-v='6'] .rw{background:var(--card)!important;border-radius:18px;color:var(--ink)}[data-v='6'] .rw.me{background:var(--card2)!important;box-shadow:inset 0 0 0 2px var(--a)}
+[data-v='6'] .rw.lo{box-shadow:inset 0 0 0 1px var(--ok)}[data-v='6'] .rw.part{background:var(--partbg)!important}
+[data-v='6'] .df.up,[data-v='6'] .up{color:var(--hot)}[data-v='6'] .df.dn,[data-v='6'] .dn{color:var(--ok)}
+[data-v='6'] h3::after{background:var(--line)}
+[data-v='6'] .card2,[data-v='6'] .tile,[data-v='6'] .sum,[data-v='6'] .state{background:var(--card);border:0;border-radius:18px}[data-v='6'] .state{border:1px dashed var(--line);background:transparent}
+[data-v='6'] .tile{box-shadow:none}[data-v='6'] .tile.t-low{background:var(--okbg);color:var(--ok)}[data-v='6'] .tile.t-same{background:var(--card2);color:var(--ink)}[data-v='6'] .tile.t-warm{background:var(--warnbg);color:var(--warn)}[data-v='6'] .tile.t-high{background:var(--badbg);color:var(--hot)}[data-v='6'] .tile.t-missing{background:var(--partbg);color:var(--ph)}[data-v='6'] .tile.me{border-color:var(--a);box-shadow:none}
+[data-v='6'] .tbl td,[data-v='6'] .tbl th,[data-v='6'] .ci,[data-v='6'] .br{border-color:var(--line)}
+[data-v='6'] .pb,[data-v='6'] .tr{background:var(--line);border:0;border-radius:4px}[data-v='6'] .tr i{border-radius:4px}
+[data-v='6'] .flt select,[data-v='6'] .flt input,[data-v='6'] input:not([type=checkbox]),[data-v='6'] select,[data-v='6'] textarea{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px}
+[data-v='6'] #stale{background:var(--badbg);color:var(--hot);box-shadow:none;border:0;border-radius:14px}
+[data-v='6'] #offb,[data-v='6'] #miss{background:var(--warnbg);color:var(--warn)}[data-v='6'] .rec{background:var(--card2);color:var(--ink)}
 [data-v='6'] #fresh,[data-v='6'] #fresh *{color:inherit}
-[data-v='6'] .toast{background:#c6ff4d;color:#10151a;bottom:calc(92px + env(safe-area-inset-bottom))}
-[data-v='6'] #cart,[data-v='6'] #sheet .box,[data-v='6'] #cmp,[data-v='6'] #cash{background:#10151a;color:#f2f5f3;border:0}[data-v='6'] .opt{background:#1b232a;border:0;border-radius:16px;box-shadow:none;color:#f2f5f3}[data-v='6'] .opt.wa{background:#25d366;color:#04200f}
-[data-v='6'] .qty{background:#232e36;border:0;border-radius:10px}[data-v='6'] .sug,[data-v='6'] .hist{background:#1b232a}
-[data-v='6'] #a11yb{background:#232e36;color:#f2f5f3;border-color:#2d3a43;bottom:calc(90px + env(safe-area-inset-bottom))}[data-v='6'] #a11yp{bottom:calc(142px + env(safe-area-inset-bottom))}
-[data-v='6'] #fresh{background:#1d3a2c!important;color:#7fe0a8!important;border-radius:14px}[data-v='6'] #fresh *{color:#7fe0a8!important;background:transparent!important}[data-v='6'] .who select{box-shadow:none}
+[data-v='6'] .toast{background:var(--a);color:var(--on);bottom:calc(92px + env(safe-area-inset-bottom))}
+[data-v='6'] #cart,[data-v='6'] #sheet .box,[data-v='6'] #cmp,[data-v='6'] #cash{background:var(--bg);color:var(--ink);border:0}[data-v='6'] .opt{background:var(--card);border:0;border-radius:16px;box-shadow:none;color:var(--ink)}[data-v='6'] .opt.wa{background:#25d366;color:#04200f}
+[data-v='6'] .qty{background:var(--card2);border:0;border-radius:10px}[data-v='6'] .sug,[data-v='6'] .hist{background:var(--card)}
+[data-v='6'] #a11yb{background:var(--card2);color:var(--ink);border-color:var(--line);bottom:calc(90px + env(safe-area-inset-bottom))}[data-v='6'] #a11yp{bottom:calc(142px + env(safe-area-inset-bottom))}
+[data-v='6'] #fresh{background:var(--okbg)!important;color:var(--ok)!important;border-radius:14px}[data-v='6'] #fresh *{color:var(--ok)!important;background:transparent!important}[data-v='6'] .who select{box-shadow:none}
 .homec{cursor:pointer}.homec .hh{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 12px;font:800 20px inherit;font-family:inherit;letter-spacing:0}.homec .hh::after{display:none}.homec .hh small{font-size:13px;font-weight:600;color:var(--mute)}
-.more{display:block;width:100%;padding:12px 24px;border:0;border-radius:14px;background:var(--a,#c6ff4d);color:var(--on,#10151a);font:800 16px inherit;font-family:inherit;min-height:44px;cursor:pointer}
-[data-v='6'] #fresh.ok{background:#1d3a2c;color:#7fe0a8}[data-v='6'] #fresh.warn{background:#3a2a10;color:#ffb74d}[data-v='6'] #fresh.bad{background:#3a1f1d;color:#ff8f84}
-[data-v='6'] .pmk{background:#3a2a10;color:#ffb74d}[data-v='6'] .pmk.in,[data-v='6'] .tgp.in{background:#1d3a2c;color:#7fe0a8}[data-v='6'] .pmk.out,[data-v='6'] .tgp.out{background:#3a1f1d;color:#ff8f84}
-[data-v='6'] .avg{background:#232e36;color:#f2f5f3}[data-v='6'] .win{color:#7fe0a8}[data-v='6'] .lose{color:#ff8f84}
-[data-v='6'] #cmp,[data-v='6'] #cash{background:#10151a;color:#f2f5f3}[data-v='6'] #cash .cp{color:#c6ff4d}[data-v='6'] #cmp td,[data-v='6'] #cmp th{border-color:#2d3a43}
+.more{display:block;width:100%;padding:12px 24px;border:0;border-radius:14px;background:var(--a,var(--a));color:var(--on,var(--bg));font:800 16px inherit;font-family:inherit;min-height:44px;cursor:pointer}
+[data-v='6'] #fresh.ok{background:var(--okbg);color:var(--ok)}[data-v='6'] #fresh.warn{background:var(--warnbg);color:var(--warn)}[data-v='6'] #fresh.bad{background:var(--badbg);color:var(--hot)}
+[data-v='6'] .pmk{background:var(--warnbg);color:var(--warn)}[data-v='6'] .pmk.in,[data-v='6'] .tgp.in{background:var(--okbg);color:var(--ok)}[data-v='6'] .pmk.out,[data-v='6'] .tgp.out{background:var(--badbg);color:var(--hot)}
+[data-v='6'] .avg{background:var(--card2);color:var(--ink)}[data-v='6'] .win{color:var(--ok)}[data-v='6'] .lose{color:var(--hot)}
+[data-v='6'] #cmp,[data-v='6'] #cash{background:var(--bg);color:var(--ink)}[data-v='6'] #cash .cp{color:var(--a)}[data-v='6'] #cmp td,[data-v='6'] #cmp th{border-color:var(--line)}
 /* bottom bar */
-[data-v='6'] #scrnav{position:fixed;inset-inline:0;bottom:0;margin:0;z-index:50;display:flex;gap:2px;justify-content:flex-start;align-items:center;height:72px;background:#0c1115;border-top:1px solid #222c34;padding:0 6px calc(env(safe-area-inset-bottom));overflow-x:auto;scrollbar-width:none}
+[data-v='6'] #scrnav{position:fixed;inset-inline:0;bottom:0;margin:0;z-index:50;display:flex;gap:2px;justify-content:flex-start;align-items:center;height:72px;background:var(--navbg);border-top:1px solid var(--navline);padding:0 6px calc(env(safe-area-inset-bottom));overflow-x:auto;scrollbar-width:none}
 [data-v='6'] #scrnav::-webkit-scrollbar{display:none}
-[data-v='6'] #scrnav .chip{background:transparent;color:#a9b6bd;border-radius:14px;min-height:52px;min-width:64px;padding:6px 8px;font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;white-space:normal;text-align:center;line-height:1.15}
-[data-v='6'] #scrnav .chip[aria-pressed=true]{background:transparent;color:#c6ff4d;font-weight:800}
-[data-v='6'] #cartbtn{bottom:calc(86px + env(safe-area-inset-bottom));background:#c6ff4d;color:#10151a;border:0;border-radius:16px;box-shadow:none}
+[data-v='6'] #scrnav .chip{background:transparent;color:var(--mute);border-radius:14px;min-height:52px;min-width:64px;padding:6px 8px;font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;white-space:normal;text-align:center;line-height:1.15}
+[data-v='6'] #scrnav .chip[aria-pressed=true]{background:transparent;color:var(--a);font-weight:800}
+[data-v='6'] #cartbtn{bottom:calc(86px + env(safe-area-inset-bottom));background:var(--a);color:var(--on);border:0;border-radius:16px;box-shadow:none}
 html[data-hc] body{background:#000}
+
+/* ---- 27.11 design pass: tokens, light theme, new components ---- */
+:root{--fs1:12px;--fs2:14px;--fs3:16px;--fs4:22px;--s1:4px;--s2:8px;--s3:12px;--s4:16px;--r1:12px;--r2:18px;--ease:cubic-bezier(.2,.7,.2,1)}
+html:root[data-v='6'][data-theme=light]{--bg:#f3f6f4;--ink:#14201a;--mute:#50605a;--card:#fff;--card2:#e9efeb;--line:#d3dcd6;--a:#1d6b37;--hot:#b3261e;--on:#fff;--meX:#e9efeb;--ok:#0a6b34;--okbg:#d8f1e0;--badbg:#fbe1dd;--warnbg:#fdebc8;--warn:#7a4a00;--navbg:#fff;--navline:#d3dcd6;--partbg:#eef2ef;--ph:#5d6d66}
+html:root[data-v='6'][data-theme=light][data-hc]{--bg:#000;--ink:#fff;--mute:#e6e6e6;--card:#000;--card2:#222;--line:#fff;--a:#ffe600;--hot:#ff9a76;--on:#000;--ok:#7fe0a8;--okbg:#000;--badbg:#000;--warnbg:#000;--warn:#ffb74d;--navbg:#000;--navline:#fff;--partbg:#000;--ph:#ccc}
+html[data-theme=light][data-v='6'] .tile.t-low{color:var(--ok)}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}}
+@keyframes slideup{from{transform:translateY(24px);opacity:0}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@keyframes bump{40%{transform:scale(1.25)}}
+@keyframes popb{40%{transform:scale(1.08)}}
+#out>*:not(.skl){animation:fadein .22s var(--ease) both}
+#cart.on .in-wrap,#sheet.on .box{animation:slideup .26s var(--ease) both}
+/* sticky search */
+#sbar{position:sticky;top:0;z-index:40;background:var(--bg);margin:0 -14px;padding:var(--s2) 14px}
+body.hasbk #sbar{top:52px}
+/* skeleton */
+.skl{display:grid;gap:var(--s3);margin-top:var(--s3)}
+.skl i{display:block;border-radius:var(--r2);background:linear-gradient(90deg,var(--card) 25%,var(--card2) 37%,var(--card) 63%);background-size:200% 100%;animation:shimmer 1.3s linear infinite}
+.skl .h{height:150px}.skl .r{height:56px}
+/* empty / error / home actions */
+.state .acts{justify-content:center}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
+.qt{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:var(--s3) var(--s4);border-radius:var(--r2);background:var(--card2);min-height:76px;justify-content:center;color:var(--ink)}
+.qt:focus-visible{outline:3px solid #ffb703;outline-offset:2px}.qt:active{transform:scale(.98)}
+.qt svg{width:24px;height:24px;color:var(--a);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.qt b{font-size:var(--fs3);font-weight:800}.qt small{font-size:var(--fs1);color:var(--mute)}
+/* recent searches: one scrolling row */
+#recent{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:var(--s2);margin:var(--s2) -14px 0;padding:0 14px;align-items:center}
+#recent::-webkit-scrollbar{display:none}
+#recent .chip{flex:none;max-width:60vw;min-height:36px;padding:6px 14px;font-size:var(--fs2)}
+#recent .rlab,#recent .lnk{flex:none;white-space:nowrap}
+/* best branch card, rows */
+.best{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);margin-top:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--r2);background:var(--okbg);color:var(--ok)}
+.best .bp{font-weight:900;font-size:34px;letter-spacing:-.04em;line-height:1;direction:ltr;flex:none}
+.best .bn{font-weight:800;font-size:var(--fs3)}.best small{display:block;font-size:var(--fs2);opacity:.95}
+.rw{grid-template-columns:30px 1fr auto 92px}
+.rw .df.up::before{content:"▲ ";font-size:.8em}.rw .df.dn::before{content:"▼ ";font-size:.8em}
+.tg.lo::before{content:"✓ "}
+.rw .gb{grid-column:1/-1;height:4px;border-radius:3px;background:var(--line,#ddd);position:relative;overflow:hidden}
+.rw .gb::after{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:calc(var(--w)*100%);background:var(--c);border-radius:3px}
+.rw.lo .pr{font-size:var(--fs4)}.rw.lo .nm b{font-size:var(--fs3)}
+.was{color:var(--mute);margin-inline-end:6px;text-decoration:line-through}
+/* bottom tab bar: search, battle, basket, more */
+[data-v='6'] #scrnav{justify-content:space-around;gap:0;padding:0 var(--s2) env(safe-area-inset-bottom);overflow:visible}
+[data-v='6'] #scrnav>.chip:not(.tab){display:none!important}
+[data-v='6'] #scrnav .tab{flex:1;min-width:0;position:relative}
+.tab svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tab .bdg{position:absolute;top:2px;inset-inline-start:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--a);color:var(--on);font:800 11px/18px Heebo,system-ui,sans-serif;text-align:center;padding:0 4px}
+.tab .bdg:empty{display:none}
+.tab[aria-pressed=true]::before{content:"";position:absolute;top:0;left:50%;margin-left:-14px;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--a)}
+#tabcart.bump svg{animation:bump .4s var(--ease)}
+[data-v='6'] #cartbtn{display:none!important}
+.chip.pop{animation:popb .35s var(--ease)}
+/* basket summary strip */
+.ctop{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s2);margin:var(--s3) 0}
+.ctop>div{border-radius:var(--r1);background:var(--card);padding:var(--s2) var(--s3);min-width:0}
+.ctop small{display:block;font-size:var(--fs1);color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctop b{font-size:var(--fs4);font-weight:900;letter-spacing:-.03em}
+.ctop .lo{background:var(--okbg);color:var(--ok)}.ctop .lo small{color:inherit}
 </style><link rel="stylesheet" href="/vendor/heebo.css"></head><body><a class="skip" href="#q">דלג לחיפוש</a>
 <div class="wrap">
   <div class="mast">
@@ -307,19 +368,21 @@ html[data-hc] body{background:#000}
   <div id="miss" role="status"></div>
   <div class="sub mono"><span>מי הכי זול ב-24 סניפים?</span><span id="upd"></span></div>
   <nav class="fl" id="scrnav" aria-label="מסכים">
-    <button type="button" class="chip" data-scr="search" aria-pressed="true">🔍 חיפוש</button>
-    <button type="button" class="chip" data-scr="dept" aria-pressed="false">🏷️ מחלקות</button>
-    <button type="button" class="chip" data-scr="war" aria-pressed="false">⚔️ מלחמת סניפים</button>
-    <button type="button" class="chip" data-scr="exp" aria-pressed="false">🔻 איפה אני יקר</button>
-    <button type="button" class="chip" data-scr="promos" aria-pressed="false">★ מבצעים</button>
+    <button type="button" class="chip tab" data-scr="search" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>חיפוש</span></button>
+    <button type="button" class="chip tab" data-scr="war" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20L20 4M4 4l16 16"/><path d="M4 4h4M20 20h-4"/></svg><span>מלחמת סניפים</span></button>
+    <button type="button" class="chip tab mgr" id="tabcart" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 7H6"/></svg><span>סל</span><i class="bdg" aria-hidden="true"></i></button>
+    <button type="button" class="chip tab" id="tabmore" aria-pressed="false" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>עוד</span></button>
+    <button type="button" class="chip px" data-scr="dept" aria-pressed="false" tabindex="-1" aria-hidden="true">מחלקות</button>
+    <button type="button" class="chip px" data-scr="exp" aria-pressed="false" tabindex="-1" aria-hidden="true">איפה אני יקר</button>
+    <button type="button" class="chip px" data-scr="promos" aria-pressed="false" tabindex="-1" aria-hidden="true">מבצעים</button>
   </nav>
   <div class="fl" id="modebar"><button type="button" class="chip" data-mode="eff" aria-pressed="true">כולל מבצעים</button><button type="button" class="chip" data-mode="reg" aria-pressed="false">מחיר מדף בלבד</button></div>
-  <form class="search" id="f" role="search">
+  <div id="sbar"><form class="search" id="f" role="search">
     <input id="q" placeholder="מה מחפשים?" inputmode="search" autocomplete="off" enterkeyhint="search">
     <button type="button" id="scan" aria-label="סרוק ברקוד" title="סרוק ברקוד במצלמה"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2h6l2 2h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
     <input type="file" id="scanfile" accept="image/*" capture="environment" hidden>
     <button aria-label="חפש">←</button>
-  </form>
+  </form></div>
   <div class="fl"><button type="button" class="chip" id="promoOnly" aria-pressed="false">★ רק מבצעים</button> <button type="button" class="chip" id="gapx">📊 דוח פערים</button> <button type="button" class="chip" id="histx">🕘 סריקות</button></div>
   <div class="fl dfl" id="diffbar">
     <span class="mono">סינון לפי הפרש ממני:</span>
@@ -327,13 +390,13 @@ html[data-hc] body{background:#000}
     <button type="button" class="chip" data-dir="pricier" aria-pressed="false">↑ יקרים ממני</button>
     <label class="amt">ב-₪ <input id="amt" type="number" inputmode="decimal" step="0.5" min="0" value="1" aria-label="הפרש מינימלי בשקלים"> לפחות</label>
   </div>
-  <div id="recent"></div>
+  <div id="recent" role="group" aria-label="חיפושים אחרונים"></div>
   <div class="toc" id="toc" role="tablist"></div>
   <div id="sug" role="listbox" aria-label="הצעות חיפוש"></div>
   <div class="fl" id="facets" aria-label="צמצום לפי מילה בשם המוצר"></div>
-  <div id="out" aria-live="polite"><div class="card2 homec"><h3 class="hh"><span>🏬 כל סניפי אושר עד</span><small>מחיר מוצר ב-24 סניפים ‹</small></h3><button type="button" class="more" data-home="scan">📷 סרוק ברקוד וראה את כל הסניפים</button></div><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div></div>
+  <div id="out" aria-live="polite"><div class="card2 homec"><h3 class="hh"><span>🏬 כל סניפי אושר עד</span><small>מחיר מוצר ב-24 סניפים</small></h3><div class="qa"><button type="button" class="qt" data-qa="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><b>חיפוש</b><small>שם מוצר או ברקוד</small></button><button type="button" class="qt" data-home="scan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-2h6l2 2h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg><b>סריקה</b><small>ברקוד במצלמה</small></button><button type="button" class="qt mgr" data-qa="cart"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 7H6"/></svg><b>הסל</b><small>הסל שלך</small></button><button type="button" class="qt" data-qa="war"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20L20 4M4 4l16 16"/><path d="M4 4h4M20 20h-4"/></svg><b>מלחמת סניפים</b><small>השוואה בין סניפים</small></button></div></div><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div></div>
 </div>
-<footer style="max-width:780px;margin:18px auto 0;padding:0 14px;text-align:center;font-size:13px;line-height:1.7;color:#a9b6bd"><div>המחירים מקובצי שקיפות המחירים של הסניפים, ייתכנו הבדלים בחנות. האתר עצמאי ואינו מטעם רשת אושר עד.</div><nav aria-label="מידע משפטי"><a href="/privacy" style="color:#c6ff4d">פרטיות</a> · <a href="/terms" style="color:#c6ff4d">תנאי שימוש</a> · <a href="/accessibility" style="color:#c6ff4d">נגישות</a></nav></footer>
+<footer style="max-width:780px;margin:18px auto 0;padding:0 14px;text-align:center;font-size:13px;line-height:1.7;color:var(--mute)"><div>המחירים מקובצי שקיפות המחירים של הסניפים, ייתכנו הבדלים בחנות. האתר עצמאי ואינו מטעם רשת אושר עד.</div><nav aria-label="מידע משפטי"><a href="/privacy" style="color:var(--a)">פרטיות</a> · <a href="/terms" style="color:var(--a)">תנאי שימוש</a> · <a href="/accessibility" style="color:var(--a)">נגישות</a></nav></footer>
 <div id="scanner"><video playsinline muted></video><p>כוון את המצלמה אל הברקוד</p><div id="scanlog" aria-live="polite"></div><button class="chip" id="scanmode" type="button" aria-pressed="false">הוספה לסל ברצף: כבוי</button><button class="chip" id="scanx" type="button">ביטול</button></div>
 <button id="cartbtn" type="button"></button>
 <div id="cart"><div class="in-wrap"></div></div>
@@ -347,6 +410,10 @@ const km=(a,b)=>{const R=6371,t=x=>x*Math.PI/180,dl=t(b[0]-a[0]),dn=t(b[1]-a[1])
 const fk=d=>(d<10?d.toFixed(1):Math.round(d))+' ק״מ';
 
 const $=s=>document.querySelector(s),out=$('#out'),toc=$('#toc');
+const SKEL='<div class="skl" aria-hidden="true"><i class="h"></i><i class="r"></i><i class="r"></i><i class="r"></i><i class="r"></i></div>';
+let LASTQ='';
+const homeH=()=>{const n=(typeof CART!=='undefined'&&CART||[]).reduce((a,i)=>a+i.qty,0);return '<div class="card2 homec"><h3 class="hh"><span>🏬 כל סניפי אושר עד</span><small>מחיר מוצר ב-24 סניפים</small></h3><div class="qa"><button type="button" class="qt" data-qa="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><b>חיפוש</b><small>שם מוצר או ברקוד</small></button><button type="button" class="qt" data-home="scan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-2h6l2 2h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg><b>סריקה</b><small>ברקוד במצלמה</small></button><button type="button" class="qt mgr" data-qa="cart"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 7H6"/></svg><b>הסל</b><small>'+(n?n+' פריטים':'ריק')+'</small></button><button type="button" class="qt" data-qa="war"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20L20 4M4 4l16 16"/><path d="M4 4h4M20 20h-4"/></svg><b>מלחמת סניפים</b><small>השוואה בין סניפים</small></button></div></div><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div>'};
+function autoMore(id){const b=document.getElementById(id);if(!b||!('IntersectionObserver' in window))return;const o=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){o.disconnect();b.click()}},{rootMargin:'300px'});o.observe(b)}
 let DIR=null,AMT=1,ME={role:'admin'},NAMES={},LAST=[],VIEW=[],cur=-1,seq=0,timer,rows=[],SORT='price',REGF=null,OPEN=new Set();
 const nm=c=>NAMES[c]||('סניף '+c);
 const MINE=()=>$('#mine').value;
@@ -382,7 +449,7 @@ async function find(){
   if(/^\d{8,14}$/.test(q))$('#q').value='';
   if(SCR!=='search')setScr('search');
   $('#sug').innerHTML='';
-  const my=++seq;out.innerHTML='<div class="sk"></div>';
+  const my=++seq;LASTQ=q;out.innerHTML=SKEL;
   try{
     let j=await fetchFind(q,50),used=q;
     // typo tolerance: nothing found -> retry with the end of the word trimmed (up to 2 letters)
@@ -395,7 +462,7 @@ async function find(){
     if(my!==seq)return;
     const c=cacheGet(q);
     if(c){NAMES=c.names||NAMES;fillMine();RAW=c.items||[];LAST=mview(RAW);offBanner('מצב אופליין · הנתונים נשמרו ב־'+new Date(c.t).toLocaleString('he-IL',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'}));applyFilter()}
-    else state('⚠️','שגיאה בטעינה<br><span class="mono">'+(navigator.onLine?'נסה שוב בעוד רגע':'אין חיבור. חיפושים קודמים זמינים מהרשימה')+'</span>')}
+    else state('⚠️','שגיאה בטעינה<br><span class="mono">'+(navigator.onLine?'נסה שוב בעוד רגע':'אין חיבור. חיפושים קודמים זמינים מהרשימה')+'</span><div class="acts"><button type="button" class="chip go" data-retry="1">↻ נסה שוב</button></div>')}
 }
 let TOK=null,MODE='eff',RAW=[],SCR='search',PV='t',STATUS=null;try{MODE=localStorage.o24mode==='reg'?'reg':'eff'}catch(e){}
 // shelf-price mode: drop promotions (effective price = shelf price)
@@ -432,11 +499,14 @@ function applyFilter(){
   if(DIR)VIEW.sort((a,b)=>diffMax(b)-diffMax(a)); // biggest gap first
   cur=VIEW.length?0:-1;REGF=null;OPEN.clear();renderToc();
   if(!VIEW.length){
+    if(!LAST.length){emptyState();return}
     const amt='₪'+AMT.toFixed(AMT%1?2:0);
     state(LAST.length?'🔎':'🔍',!LAST.length?'לא נמצא':DIR?`אין מוצרים שבהם סניף ${DIR==='cheaper'?'זול':'יקר'} ממך ב-${amt} או יותר<br><span class="mono">נסה הפרש קטן יותר או בטל את הסינון</span>`:'אין מבצעים בתוצאות האלה');
     return}
   show();
 }
+function emptyState(){const num=/^\d{8,14}$/.test(LASTQ),rc=recents().filter(x=>x.q!==LASTQ).slice(0,3);
+  out.innerHTML=`<div class="state"><b>🔍</b>${LASTQ?(num?'לא נמצא ברקוד '+esc(LASTQ):'לא נמצא "'+esc(LASTQ)+'"'):'לא נמצא'}<br><span class="mono">נסה מילה אחת, שם קצר יותר, או סרוק את הברקוד</span><div class="acts"><button type="button" class="chip go" data-home="scan">📷 סרוק ברקוד</button>${rc.map(x=>`<button type="button" class="chip" data-rq="${esc(x.q)}">${esc(x.l)}</button>`).join('')}</div></div>`}
 function renderToc(){
   toc.innerHTML=VIEW.length>1?VIEW.map((it,i)=>`<button class="pod" role="tab" aria-selected="${i===cur}" data-i="${i}" style="animation-delay:${i*35}ms"><div class="no">${String(i+1).padStart(2,'0')}</div><b>${esc(it.name)}</b>${DIR?`<div class="df ${DIR==='pricier'?'up':''}">${DIR==='cheaper'?'עד −':'עד +'}${fmt(diffMax(it))} · ${diffRows(it).length} סניפים</div>`:''}</button>`).join(''):'';
 }
@@ -457,7 +527,7 @@ function show(){
   const [w,a]=fmt(my?my.eff:lo.eff).slice(1).split('.');
   out.innerHTML=`
   <div class="hero in ${win?'win':''}">
-    <div class="pn">${esc(it.name)}</div><button class="code" data-copy="${esc(it.code)}">${esc(it.code)}</button>
+    <div class="pn">${esc(it.name)}</div><button class="code" data-copy="${esc(it.code)}">${esc(it.code)}</button>${CPB(it.code)}
     ${my?`<div class="rankstamp">${my.rank}<small>מתוך ${n}</small></div>`:''}
     <div class="mono kick">${my?'אצלך ב'+esc(nm(mine)):'הכי זול ברשת'}</div>
     <div class="huge ${my&&pct>15?'bad':''}" dir="ltr"><sup>₪</sup>${w}<sup>.${a}</sup></div>
@@ -470,6 +540,7 @@ function show(){
       <a class="chip go" target="_blank" rel="noopener" href="https://chp.co.il/${encodeURIComponent(nm(mine))}/0/0/${encodeURIComponent(it.code)}/0">🔎 CHP</a>
     </div>
   </div>
+  ${bestCard(rows,mine)}
   <h3>כל הסניפים</h3>
   <div class="fl" id="vtabs">${[['t','טבלה'],['e','חריגים קודם'],['h','מפת חום']].map(x=>`<button type="button" class="chip" data-pv="${x[0]}" aria-pressed="${PV===x[0]}">${x[1]}</button>`).join('')}</div>
   <div id="alt"></div>
@@ -504,6 +575,9 @@ function altView(){
 }
 $('#out').addEventListener('click',e=>{const b=e.target.closest('[data-pv]');if(b){PV=b.dataset.pv;altView();return}
   const h=e.target.closest('[data-hc]');if(h){const r=rows.find(x=>x.c===h.dataset.hc);$('#hdet').textContent=nm(h.dataset.hc)+': '+(r?fmt(r.eff)+' · '+terms(r):'אין נתון בקובץ האחרון')}});
+function bestCard(rs,mine){if(rs.length<2)return '';const lo=rs[0],hi=rs[rs.length-1];if(hi.eff-lo.eff<.004||lo.c===mine)return '';
+  const same=rs.filter(r=>Math.abs(r.eff-lo.eff)<.004).length-1,d=GEO[mine]&&GEO[lo.c]?' · '+fk(km(GEO[mine],GEO[lo.c])):'';
+  return `<div class="best" role="status"><div><div class="mono" style="color:inherit">הכי זול ברשת</div><div class="bn">${esc(nm(lo.c))}${d}</div><small>${same>0?'ועוד '+same+' סניפים באותו מחיר':'מתוך '+rs.length+' סניפים'}${lo.promo?' · ★ '+esc(lo.promo):''}</small></div><div class="bp">${fmt(lo.eff)}</div></div>`}
 function list(){
   const box=$('#lst');if(!box)return;altView();
   const mine=MINE(),it=VIEW[cur],hit=DIR?new Set(diffRows(it).map(r=>r.c)):null,my=rows.find(r=>r.c===mine),cheap=rows[0].eff,span=rows[rows.length-1].eff-cheap;
@@ -516,12 +590,13 @@ function list(){
   box.innerHTML=l.map(r=>{
     const isMine=r.c===mine,isLo=span>0&&r.eff===cheap,d=GEO[mine]&&GEO[r.c]&&!isMine?km(GEO[mine],GEO[r.c]):null;
     const df=my&&!isMine?r.eff-my.eff:null;
-    const subs=[r.promo?`<span class="tg">★ ${esc(r.promo)}</span>`:(r.shelf!==r.eff?'מדף '+fmt(r.shelf):''),REGS[REG[r.c]]?esc(REGS[REG[r.c]]):'',d!==null?fk(d):''].filter(Boolean).join(' · ');
+    const subs=[r.shelf-r.eff>.004?`<s class="was" title="מחיר מדף">${fmt(r.shelf)}</s>`:'',r.promo?`<span class="tg">★ ${esc(r.promo)}</span>`:'',REGS[REG[r.c]]?esc(REGS[REG[r.c]]):'',d!==null?fk(d):''].filter(Boolean).join(' · ');
     return `<div style="--t:${r.t}" class="rw ${isMine?'me':''} ${isLo?'lo':''} ${DIR&&hit.has(r.c)?'hit':''} ${DIR&&!hit.has(r.c)&&!isMine?'dim':''}">
       <span class="rk">${r.rank}</span>
       <span class="nm"><b>${esc(nm(r.c))}</b>${isMine?'<span class="tg me">אני</span>':''}${isLo?'<span class="tg lo">הכי זול</span>':''}${AN.has(r.c)?`<span class="tg an" title="סטייה מהחציון">חריג ${AN.get(r.c)>0?'+':'−'}${Math.round(Math.abs(AN.get(r.c))*100)}%</span>`:''}<small>${subs}</small></span>
       <span class="pr" style="color:${pcol(r.t)}">${fmt(r.eff)}</span>
       <span class="df ${df===null?'':df<-.004?'dn':df>.004?'up':''}">${df===null?'':Math.abs(df)<.004?'=':(df<0?'−':'+')+fmt(Math.abs(df))}</span>
+      <i class="gb" style="--w:${Math.max(.06,r.t)};--c:${pcol(r.t)}" aria-hidden="true"></i>
     </div>`}).join('')||'<div class="state">אין סניפים באזור הזה</div>';
 }
 out.addEventListener('click',e=>{
@@ -530,6 +605,10 @@ out.addEventListener('click',e=>{
   const ac=e.target.closest('[data-act]');if(ac){act(ac.dataset.act,ac);return}
   const cp=e.target.closest('.code');if(cp&&navigator.clipboard)navigator.clipboard.writeText(cp.dataset.copy).then(()=>toast('הברקוד הועתק'),()=>{});
 });
+out.addEventListener('click',e=>{
+  const qa=e.target.closest('[data-qa]');if(qa){e.stopPropagation();const k=qa.dataset.qa;if(k==='search')$('#q').focus();else if(k==='cart')openCart();else if(k==='war')openScr('war');return}
+  const rq=e.target.closest('[data-rq]');if(rq){$('#q').value=rq.dataset.rq;find();return}
+  if(e.target.closest('[data-retry]')){if(!$('#q').value)$('#q').value=LASTQ;find()}});
 out.addEventListener('change',e=>{if(e.target.id==='regsel'){REGF=e.target.value===''?null:+e.target.value;list()}});
 $('#f').onsubmit=e=>{e.preventDefault();clearTimeout(timer);find()};
 let sugT,sugSeq=0;
@@ -551,7 +630,7 @@ $('#promoOnly').onclick=e=>{const b=e.currentTarget,on=b.getAttribute('aria-pres
 const RK='o24recent';
 const recents=()=>{try{return JSON.parse(localStorage[RK]||'[]').map(x=>typeof x==='string'?{q:x,l:x}:x).filter(x=>x&&x.q&&!(x.q===x.l&&/^\d{6,}$/.test(x.q)))}catch(e){return[]}};
 function remember(q,label){const l=[{q,l:label||q},...recents().filter(x=>x.q!==q)].slice(0,5);try{localStorage[RK]=JSON.stringify(l)}catch(e){}renderRecent()}
-function renderRecent(){const l=recents(),o=$('#recent').querySelector('details')?.open;$('#recent').innerHTML=l.length?`<details class="rdet"${o?' open':''}><summary>🕘 חיפושים אחרונים (${l.length})</summary><div class="rl">${l.map(x=>`<button type="button" class="chip" data-q="${esc(x.q)}" title="${esc(x.l)}">${esc(x.l)}</button>`).join('')}<button type="button" class="lnk" data-clear="1">נקה הכל</button></div></details>`:''}
+function renderRecent(){const l=recents();$('#recent').innerHTML=l.length?'<span class="rlab mono" aria-hidden="true">🕘</span>'+l.map(x=>`<button type="button" class="chip" data-q="${esc(x.q)}" title="${esc(x.l)}">${esc(x.l)}</button>`).join('')+'<button type="button" class="lnk" data-clear="1">נקה</button>':''}
 $('#recent').onclick=e=>{
   if(e.target.dataset.clear){try{localStorage.removeItem(RK)}catch(x){}renderRecent();return}
   const b=e.target.closest('[data-q]');if(b){$('#q').value=b.dataset.q;find()}};
@@ -624,14 +703,14 @@ const CK='o24cart';
 let CART=[];try{CART=JSON.parse(localStorage[CK]||'[]')}catch(e){}
 const saveCart=()=>{try{localStorage[CK]=JSON.stringify(CART)}catch(e){}updCartBtn()};
 const inCart=code=>CART.some(i=>i.code===code);
-function updCartBtn(){const b=$('#cartbtn'),n=CART.reduce((s,i)=>s+i.qty,0);b.classList.toggle('on',n>0);b.textContent='🧺 הסל שלי · '+n}
+function updCartBtn(){const b=$('#cartbtn'),n=CART.reduce((s,i)=>s+i.qty,0);b.classList.toggle('on',n>0);b.textContent='🧺 הסל שלי · '+n;{const g=document.querySelector('#tabcart .bdg');if(g)g.textContent=n?String(n):''}}
 function act(a,btn){
   const it=VIEW[cur];if(!it)return;
   if(ME.role==='viewer')return;
   if(a==='add'){
     const k=CART.findIndex(i=>i.code===it.code);
     if(k<0){CART.push({code:it.code,name:it.name,qty:1,d:it.d});toast('נוסף לסל')}else{CART.splice(k,1);toast('הוסר מהסל')}
-    saveCart();const on=inCart(it.code);btn.classList.toggle('in-cart',on);btn.textContent=on?'✓ בסל':'🧺 הוסף לסל';
+    saveCart();const on=inCart(it.code);btn.classList.toggle('in-cart',on);btn.textContent=on?'✓ בסל':'🧺 הוסף לסל';btn.classList.remove('pop');void btn.offsetWidth;btn.classList.add('pop');{const t=document.getElementById('tabcart');if(t){t.classList.remove('bump');void t.offsetWidth;t.classList.add('bump')}}
   }else if(a==='share')openShare(modelFor([{...it,qty:1}]),it.name);
 }
 async function refreshCart(){
@@ -650,6 +729,7 @@ function renderCart(){
   const count=CART.reduce((s,i)=>s+i.qty,0);
   box.innerHTML=head+`
   <div class="mono" style="margin:4px 0 6px">${CART.length} מוצרים · ${count} יחידות</div>
+  ${(()=>{try{if(!best)return '';const sv=my&&!my.missing?my.sum-best.sum:0;return `<div class="ctop"><div><small>הסל אצלי</small><b>${my&&!my.missing?fmt(my.sum):'—'}</b></div><div class="lo"><small>הזול ביותר · ${esc(best.name)}</small><b>${fmt(best.sum)}</b></div><div><small>${sv>.004?'חיסכון אפשרי':'הפרש'}</small><b>${sv>.004?fmt(sv):'₪0.00'}</b></div></div>`}catch(e){return ''}})()}
   <div class="note" style="margin:0 0 8px">מחיר ליחידה כפי ששולמים היום, כולל מבצעים. מבצע כמות (למשל 2 ב-X) חל רק כשהכמות בסל מגיעה לכמות המבצע.</div>
   <div>${CART.map((i,k)=>`<div class="ci"><b>${esc(i.name)}</b>
     <span class="qty"><button data-q="${k}" data-d="-1" aria-label="הפחת">−</button><b>${i.qty}</b><button data-q="${k}" data-d="1" aria-label="הוסף">+</button></span>
@@ -786,17 +866,17 @@ renderRecent();updCartBtn();
 
 /* ---------- parity screens: war / where am I expensive / promos / status ---------- */
 const MGR=()=>ME.role!=='viewer';
-function setScr(n){SCR=n;document.body.dataset.scr=n;document.querySelectorAll('#scrnav [data-scr]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.scr===n))}
+function setScr(n){SCR=n;document.body.dataset.scr=n;document.querySelectorAll('#scrnav [data-scr]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.scr===n));{const m=document.getElementById('tabmore');if(m)m.setAttribute('aria-pressed',['dept','exp','promos'].includes(n))}}
 async function jget(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()}
 function noRpc(){out.innerHTML='<div class="state"><b>🔌</b>המסך הזה דורש את הפונקציות החדשות במסד הנתונים<br><span class="mono">הרץ את db/br24_readonly_rpcs.sql (ראה README)</span></div>'}
-function openScr(n,arg){setScr(n);$('#sug').innerHTML='';if(n==='search'){out.innerHTML='';if(RAW.length){LAST=mview(RAW);applyFilter()}else out.innerHTML='<div class="card2 homec"><h3 class="hh"><span>🏬 כל סניפי אושר עד</span><small>מחיר מוצר ב-24 סניפים ‹</small></h3><button type="button" class="more" data-home="scan">📷 סרוק ברקוד וראה את כל הסניפים</button></div><div class="state"><b>🛒</b>הקלד שם מוצר או ברקוד<br><span class="mono">ונראה מי הכי זול ומי הכי יקר</span></div>';return}
-  out.innerHTML='<div class="sk"></div>';({war:scrWar,exp:scrExp,promos:scrPromos,dept:scrDept})[n](arg).catch(noRpc)}
+function openScr(n,arg){setScr(n);$('#sug').innerHTML='';if(n==='search'){out.innerHTML='';if(RAW.length){LAST=mview(RAW);applyFilter()}else out.innerHTML=homeH();return}
+  out.innerHTML=SKEL;({war:scrWar,exp:scrExp,promos:scrPromos,dept:scrDept})[n](arg).catch(noRpc)}
 $('#scrnav').onclick=e=>{const b=e.target.closest('[data-scr]');if(b)openScr(b.dataset.scr)};
 let WAR={d:''};try{WAR.d=(JSON.parse(localStorage.o24war||'{}').d)||''}catch(e){}
 async function scrWar(){
   const me=MINE(),C=DEPT.C||(DEPT.C=await import('/classify.js'));
   const dsel=`<div class="flt" style="margin-bottom:8px"><div><label for="wdept">מחלקה</label><select id="wdept"><option value="">כל המחלקות</option>${C.DEPTS.map(x=>`<option value="${esc(x)}"${x===WAR.d?' selected':''}>${esc(x)}</option>`).join('')}</select></div></div>`;
-  const wire=()=>{const s=$('#wdept');if(s)s.onchange=()=>{WAR.d=s.value;try{localStorage.o24war=JSON.stringify({d:WAR.d})}catch(e){}out.innerHTML='<div class="sk"></div>';scrWar().catch(warDeptErr)}};
+  const wire=()=>{const s=$('#wdept');if(s)s.onchange=()=>{WAR.d=s.value;try{localStorage.o24war=JSON.stringify({d:WAR.d})}catch(e){}out.innerHTML=SKEL;scrWar().catch(warDeptErr)}};
   let d,noteDept='';
   if(WAR.d){
     const cat=await deptLoad();if(SCR!=='war')return;
@@ -840,6 +920,7 @@ function pairCard(me){
   const C=DEPT.C,opt=(sel,skip)=>codes.filter(c=>c!==skip).map(c=>`<option value="${c}"${c===sel?' selected':''}>${esc(nm(c))}</option>`).join('');
   const dl=(C?C.DEPTS:[]).map(x=>`<option value="${esc(x)}"${x===PW.d?' selected':''}>${esc(x)}</option>`).join('');
   return `<div class="card2" id="pw"><h2>סניף מול סניף</h2><div class="note">בחר שני סניפים, מחלקה וסכום פער חופשי</div>
+  <div id="pwtc" class="avg" style="margin-top:8px" hidden></div>
   <div class="flt" style="margin-top:8px"><div><label for="pwa">סניף א</label><select id="pwa"${pwFree()?'':' disabled'}>${opt(PW.a,'')}</select></div>
   <div><label for="pwb">סניף ב</label><select id="pwb">${opt(PW.b,PW.a)}</select></div>
   <div><label for="pwd">מחלקה</label><select id="pwd"><option value="">כל המחלקות</option>${dl}</select></div>
@@ -852,7 +933,7 @@ function pairCard(me){
 function pairWire(){
   const g=i=>document.getElementById(i);if(!g('pw'))return;
   g('pwa').onchange=()=>{PW.a=g('pwa').value;if(PW.b===PW.a)PW.b='';PW.data=null;pwSave();scrWar().catch(noRpc)};
-  g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.data=null;g('pwr').innerHTML='';g('pwm').innerHTML='';pwSave()};
+  g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.data=null;pwTopHide();g('pwr').innerHTML='';g('pwm').innerHTML='';pwSave()};
   g('pwd').onchange=()=>{PW.d=g('pwd').value;pwSave()};
   const lst=g('pwl'),tg=()=>{lst.hidden=!lst.hidden;g('pwdd').setAttribute('aria-expanded',!lst.hidden)};
   g('pwdd').onclick=e=>{e.stopPropagation();tg()};
@@ -861,14 +942,14 @@ function pairWire(){
   g('pwpr').onchange=()=>{PW.promo=g('pwpr').checked;pwSave();if(PW.data&&PW.promo&&!(PW.data.pa&&PW.data.pb)){pairRun()}else if(PW.data){const D=PW.data;if(!PW.promo){}pwRender()}};
   g('pwgo').onclick=pairRun;
   g('pwmode').onclick=e=>{const b=e.target.closest('[data-pwm]');if(!b||b.dataset.pwm===MODE)return;MODE=b.dataset.pwm;try{localStorage.o24mode=MODE}catch(x){}syncMode();
-    document.querySelectorAll('[data-pwm]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pwm===MODE));const had=!!PW.data;PW.data=null;PW.cnt=null;g('pwr').innerHTML='';g('pwm').innerHTML='';if(had)pairRun();else toast(MODE==='reg'?'מחיר מדף':'כולל מבצעים')};
+    document.querySelectorAll('[data-pwm]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pwm===MODE));const had=!!PW.data;PW.data=null;PW.cnt=null;pwTopHide();g('pwr').innerHTML='';g('pwm').innerHTML='';if(had)pairRun();else toast(MODE==='reg'?'מחיר מדף':'כולל מבצעים')};
   g('pwslots').onclick=e=>{
     const sv=e.target.closest('[data-save]');
     if(sv){const i=+sv.dataset.save,l=pwPairs();PW.d=g('pwd').value;PW.g=g('pwg').value;PW.b=g('pwb').value;PW.promo=g('pwpr').checked;pwSave();l[i]={a:PW.a,b:PW.b,d:PW.d,g:PW.g,promo:PW.promo};try{localStorage.setItem(PPK,JSON.stringify(l))}catch(x){}toast('נשמר בזוג '+(i+1));scrWar().catch(noRpc);return}
     const ld=e.target.closest('[data-slot]');
     if(ld){const p=pwPairs()[+ld.dataset.slot];if(!p)return;pwApplyPair(p);scrWar().then(()=>pairRun()).catch(noRpc)}};
-  g('pwg').addEventListener('change',()=>{PW.g=g('pwg').value;pwSave()});
-  g('pwclr').onclick=()=>{try{localStorage.removeItem(PWK)}catch(e){}PW.d='';PW.g='1';PW.promo=false;PW.b='';PW.data=null;PW.saved=0;if(pwFree())PW.a='';toast('נוקה');scrWar().catch(noRpc)};
+  g('pwg').addEventListener('change',()=>{PW.g=g('pwg').value;pwSave()});g('pwg').addEventListener('input',pwTopHide);
+  g('pwclr').onclick=()=>{try{localStorage.removeItem(PWK)}catch(e){}PW.d='';PW.g='1';PW.promo=false;PW.b='';PW.data=null;PW.saved=0;if(pwFree())PW.a='';pwTopHide();toast('נוקה');scrWar().catch(noRpc)};
   if(g('pwmiss'))g('pwmiss').onclick=pwMissing;if(PW.data&&PW.data.A===PW.a&&PW.data.B===PW.b)pwRender()}
 const pwWhen=async()=>{if(PW.when)return PW.when;try{const m=await jget('/api/meta'),t=new Date(m.updated_at);PW.when=t.toLocaleString('he-IL',{timeZone:'Asia/Jerusalem',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})}catch(e){PW.when=''}return PW.when};
 PW.pr={};
@@ -883,11 +964,12 @@ function pwRows(){
 function pwTable(rows){
   if(!rows.length)return '<div class="state">אין מוצרים לפי הסינון</div>';
   const D=PW.data,w=D.when?`<small style="display:block;color:#889;font-size:11px">מחיר מ-${esc(D.when)}</small>`:'';
-  return `<table class="tbl"><tr><th>מוצר</th><th>${esc(nm(D.A))}</th><th>${esc(nm(D.B))}</th><th>פער</th></tr>${rows.slice(0,60).map(x=>`<tr${x.hot?' style="background:rgba(255,59,48,.16)"':''}><td>${x.hot?'🔥 ':''}${esc(x.name)}<small class="mono" style="display:block;font-size:11px;direction:ltr;text-align:start">${esc(x.code)}</small>${w}</td><td class="n">${fmt(x.pa)}${x.qa?' ★':''}</td><td class="n">${fmt(x.pb)}${x.qb?' ★':''}</td><td class="n"><b>${fmt(x.gap)}</b></td></tr>`).join('')}</table>${rows.length>60?`<div class="note">מוצגים 60 הראשונים מתוך ${rows.length} (הקובץ המיוצא כולל עד 120)</div>`:''}`}
+  return `<table class="tbl"><tr><th>מוצר</th><th>${esc(nm(D.A))}</th><th>${esc(nm(D.B))}</th><th>פער</th></tr>${rows.slice(0,60).map(x=>`<tr${x.hot?' style="background:rgba(255,59,48,.16)"':''}><td>${x.hot?'🔥 ':''}${esc(x.name)}<small class="mono" style="display:block;font-size:11px;direction:ltr;text-align:start">${esc(x.code)}</small>${CPB(x.code)}${w}</td><td class="n">${fmt(x.pa)}${x.qa?' ★':''}</td><td class="n">${fmt(x.pb)}${x.qb?' ★':''}</td><td class="n"><b>${fmt(x.gap)}</b></td></tr>`).join('')}</table>${rows.length>60?`<div class="note">מוצגים 60 הראשונים מתוך ${rows.length} (הקובץ המיוצא כולל עד 120)</div>`:''}`}
 function pwRender(){
   const box=document.getElementById('pwr'),D=PW.data;if(!box||!D)return;
   const R=pwRows(),dn=D.d?` · מחלקה: ${esc(D.d)}`:'';
   box.innerHTML=`<div class="note">פער של ₪${D.gap}+${dn}${PW.promo?' · מבצעים בלבד (★ = מבצע פעיל)':''} · ${D.mode==='reg'?'מחיר מדף':'כולל מבצעים'} · 🔥 = הפערים הגדולים ביותר</div><div id="pwc" class="note" style="margin-top:4px"></div>
+  ${pwDeptSum(R,D)}
   <div class="avg"><b>${esc(nm(D.A))}</b> יקר מ-<b>${esc(nm(D.B))}</b> ב-${R.ra.length} מוצרים${R.rb?` · <b>${esc(nm(D.B))}</b> יקר מ-<b>${esc(nm(D.A))}</b> ב-${R.rb.length}`:''}</div>
   <div class="acts" style="margin:8px 0"><button type="button" class="chip go" id="pwpdf">📄 PDF</button><button type="button" class="chip go" id="pwimg">📲 תמונה לוואטסאפ</button><button type="button" class="chip go" id="pwsum">🖨️ סיכום קצר (10 הגדולים)</button></div>
   <div class="acts" style="margin:0 0 8px"><button type="button" class="chip" id="pwwa1">📨 שלח למנהל ${esc(nm(D.A))}</button>${R.rb?`<button type="button" class="chip" id="pwwa2">📨 שלח למנהל ${esc(nm(D.B))}</button>`:''}</div>
@@ -896,7 +978,25 @@ function pwRender(){
   ${(D.ra.cut||(D.rb&&D.rb.cut))?'<div class="note">התוצאות קוצרו. הגדל את הפער.</div>':''}`;
   document.getElementById('pwpdf').onclick=()=>pwExport('pdf');document.getElementById('pwimg').onclick=()=>pwExport('png');document.getElementById('pwsum').onclick=()=>pwExport('pdf',10);
   document.getElementById('pwwa1').onclick=()=>pwSend(0);const w2=document.getElementById('pwwa2');if(w2)w2.onclick=()=>pwSend(1);
-  PW.res=box.innerHTML;pwCounters().catch(()=>{})}
+  PW.res=box.innerHTML;pwTopSet(R,D);pwCounters().catch(()=>{})}
+/* copy-barcode button (works in search results, war tables, missing list, where-am-I-expensive) */
+function CPB(c){return `<button type="button" class="cpb" data-cpb="${esc(c)}" aria-label="העתק ברקוד" title="העתק ברקוד">📋</button>`}
+document.addEventListener('click',e=>{const b=e.target.closest('.cpb');if(!b)return;e.stopPropagation();e.preventDefault();
+  const t=b.dataset.cpb,ok=()=>toast('הברקוד הועתק'),fb=()=>{try{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();ok()}catch(x){toast('לא הצלחתי להעתיק')}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb()},true);
+/* top counter + per-department summary (computed from the rows already loaded, no new API) */
+function pwTopHide(){const t=document.getElementById('pwtc');if(t){t.hidden=true;t.innerHTML=''}}
+function pwTopSet(R,D){
+  const t=document.getElementById('pwtc');if(!t)return;
+  const cut=D.ra.cut||(D.rb&&D.rb.cut),n=R.ra.length+(R.rb?R.rb.length:0);
+  t.innerHTML=`🎯 <b>${cut?'לפחות ':''}${n}</b> מוצרים בפער של ₪${esc(D.gap)}+ בין ${esc(nm(D.A))} ל${esc(nm(D.B))}${R.rb?` (${esc(nm(D.A))} יקר ב-${R.ra.length} · ${esc(nm(D.B))} יקר ב-${R.rb.length})`:` (${esc(nm(D.A))} יקר ב-${R.ra.length})`}`;t.hidden=false}
+function pwDeptSum(R,D){
+  const C=DEPT.C;if(!C)return '';
+  const m=new Map(),add=(l,k)=>l.forEach(x=>{const d=C.classify(x.name,null,false)||'אחר';const o=m.get(d)||{exp:0,chp:0};o[k]++;m.set(d,o)});
+  add(R.ra,'exp');if(R.rb)add(R.rb,'chp');
+  if(!m.size)return '';
+  const rows=[...m.entries()].sort((a,b)=>(b[1].exp+b[1].chp)-(a[1].exp+a[1].chp));
+  return `<h3 style="margin:12px 0 4px">סיכום לפי מחלקה: ${esc(nm(D.A))}</h3><table class="tbl"><tr><th>מחלקה</th><th>יקר יותר</th><th>זול יותר</th></tr>${rows.map(([d,o])=>`<tr><td>${esc(d)}</td><td class="n">${o.exp}</td><td class="n">${R.rb?o.chp:'—'}</td></tr>`).join('')}</table><div class="note">הספירה כוללת רק מוצרים בפער של ₪${esc(D.gap)}+ מול ${esc(nm(D.B))}${R.rb?'':'. "זול יותר" זמין למנהל רשת בלבד'}</div>`}
 function pwSend(side){
   const D=PW.data,R=pwRows();if(!D||!R)return;const l=side?R.rb:R.ra,who=side?D.B:D.A,vs=side?D.A:D.B;if(!l||!l.length){toast('אין מוצרים לשליחה');return}
   const top=l.slice(0,10),t=`שלום, ב${nm(who)} יש מוצרים יקרים יותר מ${nm(vs)}. ${top.length} הפערים הגדולים${D.d?' (מחלקה '+D.d+')':''}:\n`+top.map((x,i)=>`${i+1}. ${x.name} (${x.code}) · ${nm(who)} ₪${(side?x.pb:x.pa).toFixed(2)} מול ${nm(vs)} ₪${(side?x.pa:x.pb).toFixed(2)} · פער ₪${x.gap.toFixed(2)}`).join('\n')+`\n(${D.mode==='reg'?'מחיר מדף':'כולל מבצעים'}${D.when?', מחירים מ-'+D.when:''})`;
@@ -957,7 +1057,7 @@ function pwMissView(){
   const M=PW.miss,box=document.getElementById('pwmt');if(!M||!box)return;
   const q=(document.getElementById('pwmq')||{value:''}).value.trim().toLowerCase();
   const f=l=>q?l.filter(r=>(r.n||'').toLowerCase().includes(q)||String(r.c).includes(q)):l;
-  const tbl=(l,who)=>{const fl=f(l);return fl.length?`<table class="tbl"><tr><th>מוצר</th><th>ברקוד</th></tr>${fl.slice(0,100).map(r=>`<tr><td>${esc(r.n)}</td><td class="mono">${esc(r.c)}</td></tr>`).join('')}</table>${fl.length>100?`<div class="note">מוצגים 100 הראשונים מתוך ${fl.length}</div>`:''}`:`<div class="state">${q?'לא נמצא בחיפוש':'אין מוצרים שיש רק ב'+esc(nm(who))}</div>`};
+  const tbl=(l,who)=>{const fl=f(l);return fl.length?`<table class="tbl"><tr><th>מוצר</th><th>ברקוד</th></tr>${fl.slice(0,100).map(r=>`<tr><td>${esc(r.n)}</td><td class="mono">${esc(r.c)}${CPB(r.c)}</td></tr>`).join('')}</table>${fl.length>100?`<div class="note">מוצגים 100 הראשונים מתוך ${fl.length}</div>`:''}`:`<div class="state">${q?'לא נמצא בחיפוש':'אין מוצרים שיש רק ב'+esc(nm(who))}</div>`};
   const fa=f(M.oa),fb=f(M.ob);
   box.innerHTML=`<h3 style="margin:12px 0 4px">יש רק ב${esc(nm(M.A))} (${q?fa.length+' מתוך '+M.oa.length:M.oa.length})</h3>${tbl(M.oa,M.A)}
   <h3 style="margin:12px 0 4px">יש רק ב${esc(nm(M.B))} (${q?fb.length+' מתוך '+M.ob.length:M.ob.length})</h3>${tbl(M.ob,M.B)}`}
@@ -966,7 +1066,7 @@ async function pwMissing(){
   const A=document.getElementById('pwa').value,B=document.getElementById('pwb').value,dep=document.getElementById('pwd').value;
   PW.a=A;PW.b=B;PW.d=dep;pwSave();
   if(!A||!B||A===B){box.innerHTML='<div class="state">בחר שני סניפים שונים</div>';return}
-  PW.busy=true;box.innerHTML='<div class="sk"></div>';
+  PW.busy=true;box.innerHTML=SKEL;
   try{
     const C=DEPT.C||(DEPT.C=await import('/classify.js'));
     const [la,lb]=await Promise.all([pwList(A),pwList(B)]);
@@ -992,7 +1092,7 @@ async function pairRun(){
   PW.d=document.getElementById('pwd').value;PW.g=document.getElementById('pwg').value;PW.b=document.getElementById('pwb').value;PW.promo=document.getElementById('pwpr').checked;pwSave();
   const gap=Math.max(0.01,+PW.g||0.01),A=PW.a,B=PW.b,both=pwFree();
   if(!A||!B||A===B){box.innerHTML='<div class="state">בחר שני סניפים שונים</div>';return}
-  PW.busy=true;box.innerHTML='<div class="sk"></div>';
+  PW.busy=true;box.innerHTML=SKEL;
   try{
     const C=DEPT.C||(DEPT.C=await import('/classify.js'));
     const load=async(me,vs)=>{let rows=[],pg=0;for(;pg<40;pg++){const d=await jget(`/api/exp?me=${me}&vs=${vs}&minc=${gap}&minp=0&sort=gap&mode=${MODE}&page=${pg}`);rows=rows.concat(d.rows||[]);if(!d.more)break}
@@ -1018,10 +1118,10 @@ async function expLoad(){
   const me=MINE(),u=`/api/exp?me=${me}&vs=${EXP.vs}&minc=${EXP.c}&minp=${EXP.p}&sort=${EXP.sort}&q=${encodeURIComponent(EXP.q)}&mode=${MODE}&page=${EXP.page}`;
   let d;try{d=await jget(u)}catch(e){return noRpc()}
   if(SCR!=='exp')return;EXP.rows=EXP.rows.concat(d.rows||[]);EXP.total=d.total||0;
-  $('#xl').innerHTML=EXP.rows.map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>${EXP.vs?'':'הכי זול: '}${esc(nm(r.cheapest))} ${fmt(r.cheapest_price)}${EXP.vs?' · אצלי '+fmt(r.m):''}${EXP.vs?'':' · '+r.n_cheaper+' סניפים זולים ב־₪'+EXP.c+'+'}</small></span><span class="pr">${fmt(r.m)}</span><span class="df up">+${fmt(r.m-r.cheapest_price)}</span></div>`).join('')||'<div class="state">לא נמצאו מוצרים לפי הסינון</div>';
-  $('#xm').innerHTML=(d.more?'<button class="chip" id="xmore">עוד תוצאות</button> ':'')+`<span class="mono">${EXP.rows.length} מתוך ${EXP.total}</span>`;
+  $('#xl').innerHTML=EXP.rows.map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>${EXP.vs?'':'הכי זול: '}${esc(nm(r.cheapest))} ${fmt(r.cheapest_price)}${EXP.vs?' · אצלי '+fmt(r.m):''}${EXP.vs?'':' · '+r.n_cheaper+' סניפים זולים ב־₪'+EXP.c+'+'}</small>${CPB(r.code)}</span><span class="pr">${fmt(r.m)}</span><span class="df up">+${fmt(r.m-r.cheapest_price)}</span></div>`).join('')||'<div class="state">לא נמצאו מוצרים לפי הסינון</div>';
+  $('#xm').innerHTML=(d.more?'<button class="chip" id="xmore">⬇ טען עוד</button> ':'')+`<span class="mono">${EXP.rows.length} מתוך ${EXP.total}</span>`;
   $('#xact').innerHTML=EXP.rows.length&&MGR()?'<button class="chip add" id="xcart">🧺 הוסף לסל (עד 120)</button><button class="chip go" id="xxl">📊 Excel</button><button class="chip go" id="xwa">📲 וואטסאפ</button>':'';
-  if($('#xmore'))$('#xmore').onclick=()=>{EXP.page++;expLoad()};
+  if($('#xmore')){$('#xmore').onclick=()=>{EXP.page++;expLoad()};autoMore('xmore')}
   $('#xl').onclick=e=>{const r=e.target.closest('[data-code]');if(r){$('#q').value=r.dataset.code;find()}};
   if($('#xcart'))$('#xcart').onclick=()=>{let n=0;EXP.rows.slice(0,120).forEach(r=>{if(!inCart(r.code)){CART.push({code:r.code,name:r.name,qty:1,d:{}});n++}});saveCart();updCartBtn();toast(n?'נוספו '+n+' מוצרים לסל':'כבר בסל')};
   if($('#xxl'))$('#xxl').onclick=expXlsx;if($('#xwa'))$('#xwa').onclick=expWa}
@@ -1043,8 +1143,8 @@ async function scrPromos(){
 async function prmLoad(){
   const d=await jget(`/api/promos?br=${PRM.br}&page=${PRM.page}`);if(SCR!=='promos')return;PRM.rows=PRM.rows.concat(d.rows||[]);PRM.total=d.total||0;
   $('#pl').innerHTML=PRM.rows.map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>★ ${esc(r.text||'מבצע')}${r.qty>1?' · מ־'+r.qty+' יח׳':''}</small></span><span class="pr">${fmt(r.eff)}</span><span class="df">${r.shelf!==r.eff?'מדף '+fmt(r.shelf):''}</span></div>`).join('')||'<div class="state">אין מבצעים בסניף הזה</div>';
-  $('#pm').innerHTML=(d.more?'<button class="chip" id="pmore">עוד</button> ':'')+`<span class="mono">${PRM.rows.length} מתוך ${PRM.total}</span>`;
-  if($('#pmore'))$('#pmore').onclick=()=>{PRM.page++;prmLoad()};
+  $('#pm').innerHTML=(d.more?'<button class="chip" id="pmore">⬇ טען עוד</button> ':'')+`<span class="mono">${PRM.rows.length} מתוך ${PRM.total}</span>`;
+  if($('#pmore')){$('#pmore').onclick=()=>{PRM.page++;prmLoad()};autoMore('pmore')}
   $('#pl').onclick=e=>{const r=e.target.closest('[data-code]');if(r){$('#q').value=r.dataset.code;find()}}}
 
 /* ---------- departments (name-based classification, like PriceWatch; needs br24_list) ---------- */
@@ -1271,8 +1371,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-home=scan]
 
 (function(){
   const st=document.createElement('style');
-  st.textContent=`#bk{position:fixed;top:0;inset-inline:0;height:52px;z-index:95;display:flex;align-items:center;padding:0 12px;background:#10151a;border-bottom:1px solid #2d3a43}#bk[hidden]{display:none}
-  #bk button{min-height:40px;padding:0 18px;border:0;border-radius:20px;background:#c6ff4d;color:#10151a;font:800 16px inherit;cursor:pointer}
+  st.textContent=`#bk{position:fixed;top:0;inset-inline:0;height:52px;z-index:95;display:flex;align-items:center;padding:0 12px;background:var(--bg,#10151a);border-bottom:1px solid var(--line,#2d3a43)}#bk[hidden]{display:none}
+  #bk button{min-height:40px;padding:0 18px;border:0;border-radius:20px;background:var(--a,#c6ff4d);color:var(--on,#10151a);font:800 16px inherit;cursor:pointer}
   body.hasbk{padding-top:52px}body.hasbk #cart,body.hasbk #cmp,body.hasbk #cash,body.hasbk #scanner{padding-top:52px;box-sizing:border-box}
   .rdet summary{list-style:none}.rdet summary::-webkit-details-marker{display:none}`;
   document.head.appendChild(st);
@@ -1331,6 +1431,29 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-home=scan]
   const _s=show;
   show=function(){_s();const h=[...document.querySelectorAll('#out h3')].find(x=>x.textContent.trim()==='כל הסניפים');
     if(h&&!h.querySelector('.shtxt')){const b=document.createElement('button');b.type='button';b.className='chip go shtxt';b.textContent='📲 שתף רשימה';b.onclick=share;h.appendChild(b)}};
+})();
+</script>
+<script>
+(function(){
+  const tc=document.getElementById('tabcart'),tm=document.getElementById('tabmore');if(!tc||!tm)return;
+  tc.onclick=()=>openCart();
+  const TH={dark:'כהה',light:'בהיר',auto:'אוטומטי (לפי המכשיר)'},NEXT={dark:'light',light:'auto',auto:'dark'};
+  const theme=()=>{try{return localStorage.o24theme||'dark'}catch(e){return 'dark'}};
+  let UT=[];
+  function more(){
+    UT=[...document.querySelectorAll('#scrnav>button:not(.tab):not(.px)')];
+    const sc=[['dept','🏷️','מחלקות','כל המוצרים לפי מחלקה'],['exp','🔻','איפה אני יקר','מוצרים שבהם סניפים אחרים זולים ממני'],['promos','★','מבצעים','מבצעים פעילים בסניף']];
+    const item=(a,ic,t,sm)=>`<button type="button" class="opt" ${a}><span class="ic">${ic}</span><span>${t}${sm?`<small>${sm}</small>`:''}</span></button>`;
+    openSheet(`<div class="ch"><h2 style="font-size:24px">עוד</h2><button class="chip" data-x="1">סגור ✕</button></div>`
+      +sc.map(x=>item('data-more="'+x[0]+'"',x[1],x[2],x[3])).join('')
+      +UT.map((b,i)=>{const t=b.textContent.trim(),k=t.indexOf(' ');return item('data-u="'+i+'"',k>0?t.slice(0,k):'•',esc(k>0?t.slice(k+1):t),'')}).join('')
+      +item('data-theme="1"','🌓','מראה: '+TH[theme()],'לחיצה מחליפה: כהה, בהיר, אוטומטי'));
+  }
+  tm.onclick=more;
+  sbox.addEventListener('click',e=>{
+    const m=e.target.closest('[data-more]');if(m){closeSheet();const b=document.querySelector('#scrnav [data-scr="'+m.dataset.more+'"]');if(b)b.click();return}
+    const u=e.target.closest('[data-u]');if(u){closeSheet();const b=UT[+u.dataset.u];if(b)b.click();return}
+    if(e.target.closest('[data-theme]')){const n=NEXT[theme()];try{localStorage.o24theme=n}catch(x){}window.o24theme();more()}});
 })();
 </script>
 <script src="/notice.js" defer></script></body></html>
