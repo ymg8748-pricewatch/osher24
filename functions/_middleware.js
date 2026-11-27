@@ -49,8 +49,8 @@ function page(err, chosen, codes, vname) {
 <button style="width:100%;padding:12px;font:900 18px inherit;background:#c9ff2f;border:2px solid #111;cursor:pointer">כניסה</button>
 <script>(function(){var b=document.getElementById('brsel'),v=document.getElementById('vnrow'),k=document.getElementById('kindrow');function t(){var w=b.value==='w';v.style.display=w?'':'none';k.style.display=w?'none':''}b.addEventListener('change',t);t()})()</script>
 ${err ? '<p style="color:#c0310a;font-weight:700;margin:12px 0 0">סניף או סיסמה שגויים</p>' : ''}
-</form>
-<p style="max-width:340px;margin:14px auto 0;text-align:center;font-size:13px;line-height:1.7;color:#6d6a60">הכניסה מהווה הסכמה ל<a href="/terms" style="color:#2447ff">תנאי השימוש</a> ול<a href="/privacy" style="color:#2447ff">מדיניות הפרטיות</a> · <a href="/accessibility" style="color:#2447ff">נגישות</a></p><script src="/notice.js" defer></script></body></html>`, { status: 401, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
+<p style="max-width:340px;margin:14px auto 0;text-align:center;font-size:13px;line-height:1.7;color:#6d6a60">הכניסה מהווה הסכמה ל<a href="/terms" style="color:#2447ff">תנאי השימוש</a> ול<a href="/privacy" style="color:#2447ff">מדיניות הפרטיות</a> · <a href="/accessibility" style="color:#2447ff">נגישות</a></p>
+</form><script src="/notice.js" defer></script></body></html>`, { status: 401, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
 }
 
 const tooMany = () => new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><body dir="rtl" style="font-family:system-ui;padding:20vh 20px;text-align:center"><h2>יותר מדי ניסיונות</h2><p>נסה שוב בעוד 15 דקות.</p></body>', { status: 429, headers: { 'content-type': 'text/html; charset=utf-8', 'retry-after': String(WINDOW), 'cache-control': 'no-store' } });
