@@ -823,7 +823,13 @@ async function scrWar(){
 /* ---------- war: branch vs branch + department + free gap ---------- */
 let PW={a:'',b:'',d:'',g:'1',res:null,busy:false};
 const pwFree=()=>ME.role==='admin'||(ME.role==='viewer'&&!ME.branch);
+const PWK='osher24.pw';
+function pwSave(){try{localStorage.setItem(PWK,JSON.stringify({a:PW.a,b:PW.b,d:PW.d||'',g:PW.g,promo:!!PW.promo}))}catch(e){}}
+function pwLoad(){try{const x=JSON.parse(localStorage.getItem(PWK)||'null');if(!x)return;
+  if(pwFree()&&NAMES[x.a])PW.a=x.a;if(NAMES[x.b])PW.b=x.b;PW.d=typeof x.d==='string'?x.d:'';
+  if(+x.g>0)PW.g=String(x.g);PW.promo=!!x.promo;PW.saved=1}catch(e){}}
 function pairCard(me){
+  if(!PW.loaded){PW.loaded=1;pwLoad()}
   if(!PW.a||!pwFree())PW.a=me;
   const codes=Object.keys(NAMES).sort((x,y)=>nm(x).localeCompare(nm(y),'he'));
   if(!PW.b||PW.b===PW.a)PW.b=codes.find(c=>c!==PW.a)||'';
@@ -836,18 +842,21 @@ function pairCard(me){
   <div style="position:relative"><label for="pwg">פער מינימלי (₪)</label><div style="display:flex;gap:6px"><input id="pwg" type="number" inputmode="decimal" min="0.01" step="any" value="${esc(PW.g)}" placeholder="הקלד או בחר" style="flex:1;min-width:0"><button type="button" class="chip" id="pwdd" aria-label="הצעות לפער" aria-expanded="false">▾</button></div>
   <ul id="pwl" hidden role="listbox" style="position:absolute;inset-inline:0;top:100%;z-index:30;margin:4px 0 0;padding:4px;list-style:none;background:#1b242c;border:1px solid #2d3a43;border-radius:12px;box-shadow:0 8px 24px #0008">${[['0.1','10 אגורות'],['0.2','20 אגורות'],['0.3','30 אגורות'],['1','₪1'],['2','₪2'],['3','₪3'],['4','₪4'],['5','₪5']].map(([v,l])=>`<li role="option" data-pg="${v}" style="padding:10px 12px;cursor:pointer;border-radius:8px">${l}</li>`).join('')}</ul></div></div>
   <label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="pwpr"${PW.promo?' checked':''}> מבצעים בלבד (מוצר שיש עליו מבצע באחד הסניפים)</label>
-  <div class="acts" style="margin-top:8px"><button type="button" class="chip go" id="pwgo">⚔️ השווה</button></div><div id="pwr" style="margin-top:10px"></div></div>`}
+  <div class="acts" style="margin-top:8px"><button type="button" class="chip go" id="pwgo">⚔️ השווה</button>${pwFree()?'<button type="button" class="chip go" id="pwmiss">🔍 מוצרים שחסרים באחד הסניפים</button>':''}<button type="button" class="chip" id="pwclr">🧹 נקה שמורה</button></div><div class="note" style="margin-top:6px">הבחירה האחרונה נשמרת רק בדפדפן הזה</div><div id="pwr" style="margin-top:10px"></div><div id="pwm" style="margin-top:10px"></div></div>`}
 function pairWire(){
   const g=i=>document.getElementById(i);if(!g('pw'))return;
-  g('pwa').onchange=()=>{PW.a=g('pwa').value;if(PW.b===PW.a)PW.b='';PW.data=null;scrWar().catch(noRpc)};
-  g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.data=null;g('pwr').innerHTML=''};
-  g('pwd').onchange=()=>{PW.d=g('pwd').value};
+  g('pwa').onchange=()=>{PW.a=g('pwa').value;if(PW.b===PW.a)PW.b='';PW.data=null;pwSave();scrWar().catch(noRpc)};
+  g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.data=null;g('pwr').innerHTML='';g('pwm').innerHTML='';pwSave()};
+  g('pwd').onchange=()=>{PW.d=g('pwd').value;pwSave()};
   const lst=g('pwl'),tg=()=>{lst.hidden=!lst.hidden;g('pwdd').setAttribute('aria-expanded',!lst.hidden)};
   g('pwdd').onclick=e=>{e.stopPropagation();tg()};
-  lst.onclick=e=>{const x=e.target.closest('[data-pg]');if(!x)return;g('pwg').value=x.dataset.pg;PW.g=x.dataset.pg;lst.hidden=true;g('pwdd').setAttribute('aria-expanded','false');pairRun()};
+  lst.onclick=e=>{const x=e.target.closest('[data-pg]');if(!x)return;g('pwg').value=x.dataset.pg;PW.g=x.dataset.pg;pwSave();lst.hidden=true;g('pwdd').setAttribute('aria-expanded','false');pairRun()};
   document.addEventListener('click',e=>{if(!lst.hidden&&!e.target.closest('#pwl'))lst.hidden=true});
-  g('pwpr').onchange=()=>{PW.promo=g('pwpr').checked;if(PW.data&&PW.promo&&!(PW.data.pa&&PW.data.pb)){pairRun()}else if(PW.data){const D=PW.data;if(!PW.promo){}pwRender()}};
-  g('pwgo').onclick=pairRun;if(PW.data&&PW.data.A===PW.a&&PW.data.B===PW.b)pwRender()}
+  g('pwpr').onchange=()=>{PW.promo=g('pwpr').checked;pwSave();if(PW.data&&PW.promo&&!(PW.data.pa&&PW.data.pb)){pairRun()}else if(PW.data){const D=PW.data;if(!PW.promo){}pwRender()}};
+  g('pwgo').onclick=pairRun;
+  g('pwg').addEventListener('change',()=>{PW.g=g('pwg').value;pwSave()});
+  g('pwclr').onclick=()=>{try{localStorage.removeItem(PWK)}catch(e){}PW.d='';PW.g='1';PW.promo=false;PW.b='';PW.data=null;PW.saved=0;if(pwFree())PW.a='';toast('נוקה');scrWar().catch(noRpc)};
+  if(g('pwmiss'))g('pwmiss').onclick=pwMissing;if(PW.data&&PW.data.A===PW.a&&PW.data.B===PW.b)pwRender()}
 const pwWhen=async()=>{if(PW.when)return PW.when;try{const m=await jget('/api/meta'),t=new Date(m.updated_at);PW.when=t.toLocaleString('he-IL',{timeZone:'Asia/Jerusalem',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})}catch(e){PW.when=''}return PW.when};
 PW.pr={};
 async function pwPromos(br){if(PW.pr[br])return PW.pr[br];const set=new Set();for(let pg=0;pg<40;pg++){const d=await jget(`/api/promos?br=${br}&page=${pg}`);(d.rows||[]).forEach(r=>set.add(String(r.code)));if(!d.more)break}return PW.pr[br]=set}
@@ -900,9 +909,36 @@ async function pwExport(kind){
     if(kind==='pdf')await deliver(X.canvasToPdf(cv),name+'.pdf','application/pdf',txt,false);
     else await deliver(await toBlob(cv,'image/png'),name+'.png','image/png',txt,true)}
   catch(e){console.error(e);toast('לא הצלחתי להכין את הקובץ')}}
+PW.ls={};
+async function pwList(br){
+  if(PW.ls[br])return PW.ls[br];const m=new Map();
+  for(let pg=0;pg<8;pg++){const d=await jget(`/api/list?me=${br}&mode=${MODE}&page=${pg}`);(d.rows||[]).forEach(r=>m.set(String(r[0]),r[1]));if(!d.more)break}
+  return PW.ls[br]=m}
+async function pwMissing(){
+  const box=document.getElementById('pwm');if(!box||PW.busy||!pwFree())return;
+  const A=document.getElementById('pwa').value,B=document.getElementById('pwb').value,dep=document.getElementById('pwd').value;
+  PW.a=A;PW.b=B;PW.d=dep;pwSave();
+  if(!A||!B||A===B){box.innerHTML='<div class="state">בחר שני סניפים שונים</div>';return}
+  PW.busy=true;box.innerHTML='<div class="sk"></div>';
+  try{
+    const C=DEPT.C||(DEPT.C=await import('/classify.js'));
+    const [la,lb]=await Promise.all([pwList(A),pwList(B)]);
+    const warn=[];
+    if(!la.size||!lb.size){
+      box.innerHTML=`<div class="state">אין נתוני מוצרים ל${esc(nm(la.size?B:A))} כרגע (ייתכן שהקובץ לא פורסם), אי אפשר להשוות</div>`;PW.busy=false;return}
+    if(Math.min(la.size,lb.size)<0.6*Math.max(la.size,lb.size))warn.push(`${esc(nm(la.size<lb.size?A:B))} מדווח על ${Math.min(la.size,lb.size)} מוצרים בלבד מול ${Math.max(la.size,lb.size)} בסניף השני. ייתכן שחלק מהקובץ חסר, אז הרשימות עלולות להיות מנופחות.`);
+    const only=(x,y)=>[...x].filter(([c])=>!y.has(c)).map(([c,n])=>({c,n})).filter(r=>!dep||C.classify(r.n,null,false)===dep);
+    const oa=only(la,lb),ob=only(lb,la);
+    const tbl=(l,who)=>l.length?`<table class="tbl"><tr><th>מוצר</th><th>ברקוד</th></tr>${l.slice(0,100).map(r=>`<tr><td>${esc(r.n)}</td><td class="mono">${esc(r.c)}</td></tr>`).join('')}</table>${l.length>100?`<div class="note">מוצגים 100 הראשונים מתוך ${l.length}</div>`:''}`:`<div class="state">אין מוצרים שיש רק ב${esc(nm(who))}</div>`;
+    box.innerHTML=`<div class="note">מוצרים עם מחיר ביום עדכון אחד בלבד${dep?' · מחלקה: '+esc(dep):''}</div>${warn.map(w=>`<div class="state" style="color:#ffb340">⚠️ ${w}</div>`).join('')}
+    <h3 style="margin:12px 0 4px">יש רק ב${esc(nm(A))} (${oa.length})</h3>${tbl(oa,A)}
+    <h3 style="margin:12px 0 4px">יש רק ב${esc(nm(B))} (${ob.length})</h3>${tbl(ob,B)}
+    <div class="note">שים לב: אותו מוצר יכול להופיע תחת ברקוד שונה בכל סניף (אריזה, גרסה), ואז הוא יוצג כחסר בשני הצדדים. מוצר שאף סניף אחר לא מחזיק לא מופיע כאן.</div>`;
+  }catch(e){box.innerHTML='<div class="state">שגיאה בטעינת המוצרים, נסה שוב</div>'}
+  PW.busy=false}
 async function pairRun(){
   const box=document.getElementById('pwr');if(!box||PW.busy)return;
-  PW.d=document.getElementById('pwd').value;PW.g=document.getElementById('pwg').value;PW.b=document.getElementById('pwb').value;PW.promo=document.getElementById('pwpr').checked;
+  PW.d=document.getElementById('pwd').value;PW.g=document.getElementById('pwg').value;PW.b=document.getElementById('pwb').value;PW.promo=document.getElementById('pwpr').checked;pwSave();
   const gap=Math.max(0.01,+PW.g||0.01),A=PW.a,B=PW.b,both=pwFree();
   if(!A||!B||A===B){box.innerHTML='<div class="state">בחר שני סניפים שונים</div>';return}
   PW.busy=true;box.innerHTML='<div class="sk"></div>';
@@ -1247,3 +1283,4 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-home=scan]
 })();
 </script>
 </body></html>
+
