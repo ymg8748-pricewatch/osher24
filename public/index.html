@@ -50,6 +50,7 @@ button{font-family:inherit;color:inherit}
 .hero{border:var(--bw) solid var(--ink);background:var(--card);box-shadow:var(--sh);padding:16px 16px 18px;position:relative;overflow:hidden}
 .hero.win{background:var(--lime)}
 .hero .pn{font-weight:800;font-size:17px;line-height:1.25;max-width:80%}
+.cpb{margin-inline-start:6px;padding:4px 10px;min-height:30px;border:1px solid #2d3a43;border-radius:8px;background:#1b242c;color:inherit;font-size:14px;line-height:1;cursor:pointer;vertical-align:middle}.cpb:active{background:#2d3a43}
 .code{font:12px var(--mono);color:var(--mute);background:none;border:0;padding:0;cursor:pointer;direction:ltr;unicode-bidi:isolate}
 .kick{margin-top:16px}
 .huge{justify-content:flex-end;font-weight:900;font-size:clamp(76px,25vw,150px);line-height:.85;letter-spacing:-.07em;margin:2px 0 8px;display:flex;align-items:baseline;gap:6px}
@@ -457,7 +458,7 @@ function show(){
   const [w,a]=fmt(my?my.eff:lo.eff).slice(1).split('.');
   out.innerHTML=`
   <div class="hero in ${win?'win':''}">
-    <div class="pn">${esc(it.name)}</div><button class="code" data-copy="${esc(it.code)}">${esc(it.code)}</button>
+    <div class="pn">${esc(it.name)}</div><button class="code" data-copy="${esc(it.code)}">${esc(it.code)}</button>${CPB(it.code)}
     ${my?`<div class="rankstamp">${my.rank}<small>מתוך ${n}</small></div>`:''}
     <div class="mono kick">${my?'אצלך ב'+esc(nm(mine)):'הכי זול ברשת'}</div>
     <div class="huge ${my&&pct>15?'bad':''}" dir="ltr"><sup>₪</sup>${w}<sup>.${a}</sup></div>
@@ -840,6 +841,7 @@ function pairCard(me){
   const C=DEPT.C,opt=(sel,skip)=>codes.filter(c=>c!==skip).map(c=>`<option value="${c}"${c===sel?' selected':''}>${esc(nm(c))}</option>`).join('');
   const dl=(C?C.DEPTS:[]).map(x=>`<option value="${esc(x)}"${x===PW.d?' selected':''}>${esc(x)}</option>`).join('');
   return `<div class="card2" id="pw"><h2>סניף מול סניף</h2><div class="note">בחר שני סניפים, מחלקה וסכום פער חופשי</div>
+  <div id="pwtc" class="avg" style="margin-top:8px" hidden></div>
   <div class="flt" style="margin-top:8px"><div><label for="pwa">סניף א</label><select id="pwa"${pwFree()?'':' disabled'}>${opt(PW.a,'')}</select></div>
   <div><label for="pwb">סניף ב</label><select id="pwb">${opt(PW.b,PW.a)}</select></div>
   <div><label for="pwd">מחלקה</label><select id="pwd"><option value="">כל המחלקות</option>${dl}</select></div>
@@ -852,7 +854,7 @@ function pairCard(me){
 function pairWire(){
   const g=i=>document.getElementById(i);if(!g('pw'))return;
   g('pwa').onchange=()=>{PW.a=g('pwa').value;if(PW.b===PW.a)PW.b='';PW.data=null;pwSave();scrWar().catch(noRpc)};
-  g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.data=null;g('pwr').innerHTML='';g('pwm').innerHTML='';pwSave()};
+  g('pwb').onchange=()=>{PW.b=g('pwb').value;PW.data=null;pwTopHide();g('pwr').innerHTML='';g('pwm').innerHTML='';pwSave()};
   g('pwd').onchange=()=>{PW.d=g('pwd').value;pwSave()};
   const lst=g('pwl'),tg=()=>{lst.hidden=!lst.hidden;g('pwdd').setAttribute('aria-expanded',!lst.hidden)};
   g('pwdd').onclick=e=>{e.stopPropagation();tg()};
@@ -861,14 +863,14 @@ function pairWire(){
   g('pwpr').onchange=()=>{PW.promo=g('pwpr').checked;pwSave();if(PW.data&&PW.promo&&!(PW.data.pa&&PW.data.pb)){pairRun()}else if(PW.data){const D=PW.data;if(!PW.promo){}pwRender()}};
   g('pwgo').onclick=pairRun;
   g('pwmode').onclick=e=>{const b=e.target.closest('[data-pwm]');if(!b||b.dataset.pwm===MODE)return;MODE=b.dataset.pwm;try{localStorage.o24mode=MODE}catch(x){}syncMode();
-    document.querySelectorAll('[data-pwm]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pwm===MODE));const had=!!PW.data;PW.data=null;PW.cnt=null;g('pwr').innerHTML='';g('pwm').innerHTML='';if(had)pairRun();else toast(MODE==='reg'?'מחיר מדף':'כולל מבצעים')};
+    document.querySelectorAll('[data-pwm]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pwm===MODE));const had=!!PW.data;PW.data=null;PW.cnt=null;pwTopHide();g('pwr').innerHTML='';g('pwm').innerHTML='';if(had)pairRun();else toast(MODE==='reg'?'מחיר מדף':'כולל מבצעים')};
   g('pwslots').onclick=e=>{
     const sv=e.target.closest('[data-save]');
     if(sv){const i=+sv.dataset.save,l=pwPairs();PW.d=g('pwd').value;PW.g=g('pwg').value;PW.b=g('pwb').value;PW.promo=g('pwpr').checked;pwSave();l[i]={a:PW.a,b:PW.b,d:PW.d,g:PW.g,promo:PW.promo};try{localStorage.setItem(PPK,JSON.stringify(l))}catch(x){}toast('נשמר בזוג '+(i+1));scrWar().catch(noRpc);return}
     const ld=e.target.closest('[data-slot]');
     if(ld){const p=pwPairs()[+ld.dataset.slot];if(!p)return;pwApplyPair(p);scrWar().then(()=>pairRun()).catch(noRpc)}};
-  g('pwg').addEventListener('change',()=>{PW.g=g('pwg').value;pwSave()});
-  g('pwclr').onclick=()=>{try{localStorage.removeItem(PWK)}catch(e){}PW.d='';PW.g='1';PW.promo=false;PW.b='';PW.data=null;PW.saved=0;if(pwFree())PW.a='';toast('נוקה');scrWar().catch(noRpc)};
+  g('pwg').addEventListener('change',()=>{PW.g=g('pwg').value;pwSave()});g('pwg').addEventListener('input',pwTopHide);
+  g('pwclr').onclick=()=>{try{localStorage.removeItem(PWK)}catch(e){}PW.d='';PW.g='1';PW.promo=false;PW.b='';PW.data=null;PW.saved=0;if(pwFree())PW.a='';pwTopHide();toast('נוקה');scrWar().catch(noRpc)};
   if(g('pwmiss'))g('pwmiss').onclick=pwMissing;if(PW.data&&PW.data.A===PW.a&&PW.data.B===PW.b)pwRender()}
 const pwWhen=async()=>{if(PW.when)return PW.when;try{const m=await jget('/api/meta'),t=new Date(m.updated_at);PW.when=t.toLocaleString('he-IL',{timeZone:'Asia/Jerusalem',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})}catch(e){PW.when=''}return PW.when};
 PW.pr={};
@@ -883,11 +885,12 @@ function pwRows(){
 function pwTable(rows){
   if(!rows.length)return '<div class="state">אין מוצרים לפי הסינון</div>';
   const D=PW.data,w=D.when?`<small style="display:block;color:#889;font-size:11px">מחיר מ-${esc(D.when)}</small>`:'';
-  return `<table class="tbl"><tr><th>מוצר</th><th>${esc(nm(D.A))}</th><th>${esc(nm(D.B))}</th><th>פער</th></tr>${rows.slice(0,60).map(x=>`<tr${x.hot?' style="background:rgba(255,59,48,.16)"':''}><td>${x.hot?'🔥 ':''}${esc(x.name)}<small class="mono" style="display:block;font-size:11px;direction:ltr;text-align:start">${esc(x.code)}</small>${w}</td><td class="n">${fmt(x.pa)}${x.qa?' ★':''}</td><td class="n">${fmt(x.pb)}${x.qb?' ★':''}</td><td class="n"><b>${fmt(x.gap)}</b></td></tr>`).join('')}</table>${rows.length>60?`<div class="note">מוצגים 60 הראשונים מתוך ${rows.length} (הקובץ המיוצא כולל עד 120)</div>`:''}`}
+  return `<table class="tbl"><tr><th>מוצר</th><th>${esc(nm(D.A))}</th><th>${esc(nm(D.B))}</th><th>פער</th></tr>${rows.slice(0,60).map(x=>`<tr${x.hot?' style="background:rgba(255,59,48,.16)"':''}><td>${x.hot?'🔥 ':''}${esc(x.name)}<small class="mono" style="display:block;font-size:11px;direction:ltr;text-align:start">${esc(x.code)}</small>${CPB(x.code)}${w}</td><td class="n">${fmt(x.pa)}${x.qa?' ★':''}</td><td class="n">${fmt(x.pb)}${x.qb?' ★':''}</td><td class="n"><b>${fmt(x.gap)}</b></td></tr>`).join('')}</table>${rows.length>60?`<div class="note">מוצגים 60 הראשונים מתוך ${rows.length} (הקובץ המיוצא כולל עד 120)</div>`:''}`}
 function pwRender(){
   const box=document.getElementById('pwr'),D=PW.data;if(!box||!D)return;
   const R=pwRows(),dn=D.d?` · מחלקה: ${esc(D.d)}`:'';
   box.innerHTML=`<div class="note">פער של ₪${D.gap}+${dn}${PW.promo?' · מבצעים בלבד (★ = מבצע פעיל)':''} · ${D.mode==='reg'?'מחיר מדף':'כולל מבצעים'} · 🔥 = הפערים הגדולים ביותר</div><div id="pwc" class="note" style="margin-top:4px"></div>
+  ${pwDeptSum(R,D)}
   <div class="avg"><b>${esc(nm(D.A))}</b> יקר מ-<b>${esc(nm(D.B))}</b> ב-${R.ra.length} מוצרים${R.rb?` · <b>${esc(nm(D.B))}</b> יקר מ-<b>${esc(nm(D.A))}</b> ב-${R.rb.length}`:''}</div>
   <div class="acts" style="margin:8px 0"><button type="button" class="chip go" id="pwpdf">📄 PDF</button><button type="button" class="chip go" id="pwimg">📲 תמונה לוואטסאפ</button><button type="button" class="chip go" id="pwsum">🖨️ סיכום קצר (10 הגדולים)</button></div>
   <div class="acts" style="margin:0 0 8px"><button type="button" class="chip" id="pwwa1">📨 שלח למנהל ${esc(nm(D.A))}</button>${R.rb?`<button type="button" class="chip" id="pwwa2">📨 שלח למנהל ${esc(nm(D.B))}</button>`:''}</div>
@@ -896,7 +899,25 @@ function pwRender(){
   ${(D.ra.cut||(D.rb&&D.rb.cut))?'<div class="note">התוצאות קוצרו. הגדל את הפער.</div>':''}`;
   document.getElementById('pwpdf').onclick=()=>pwExport('pdf');document.getElementById('pwimg').onclick=()=>pwExport('png');document.getElementById('pwsum').onclick=()=>pwExport('pdf',10);
   document.getElementById('pwwa1').onclick=()=>pwSend(0);const w2=document.getElementById('pwwa2');if(w2)w2.onclick=()=>pwSend(1);
-  PW.res=box.innerHTML;pwCounters().catch(()=>{})}
+  PW.res=box.innerHTML;pwTopSet(R,D);pwCounters().catch(()=>{})}
+/* copy-barcode button (works in search results, war tables, missing list, where-am-I-expensive) */
+function CPB(c){return `<button type="button" class="cpb" data-cpb="${esc(c)}" aria-label="העתק ברקוד" title="העתק ברקוד">📋</button>`}
+document.addEventListener('click',e=>{const b=e.target.closest('.cpb');if(!b)return;e.stopPropagation();e.preventDefault();
+  const t=b.dataset.cpb,ok=()=>toast('הברקוד הועתק'),fb=()=>{try{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();ok()}catch(x){toast('לא הצלחתי להעתיק')}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb()},true);
+/* top counter + per-department summary (computed from the rows already loaded, no new API) */
+function pwTopHide(){const t=document.getElementById('pwtc');if(t){t.hidden=true;t.innerHTML=''}}
+function pwTopSet(R,D){
+  const t=document.getElementById('pwtc');if(!t)return;
+  const cut=D.ra.cut||(D.rb&&D.rb.cut),n=R.ra.length+(R.rb?R.rb.length:0);
+  t.innerHTML=`🎯 <b>${cut?'לפחות ':''}${n}</b> מוצרים בפער של ₪${esc(D.gap)}+ בין ${esc(nm(D.A))} ל${esc(nm(D.B))}${R.rb?` (${esc(nm(D.A))} יקר ב-${R.ra.length} · ${esc(nm(D.B))} יקר ב-${R.rb.length})`:` (${esc(nm(D.A))} יקר ב-${R.ra.length})`}`;t.hidden=false}
+function pwDeptSum(R,D){
+  const C=DEPT.C;if(!C)return '';
+  const m=new Map(),add=(l,k)=>l.forEach(x=>{const d=C.classify(x.name,null,false)||'אחר';const o=m.get(d)||{exp:0,chp:0};o[k]++;m.set(d,o)});
+  add(R.ra,'exp');if(R.rb)add(R.rb,'chp');
+  if(!m.size)return '';
+  const rows=[...m.entries()].sort((a,b)=>(b[1].exp+b[1].chp)-(a[1].exp+a[1].chp));
+  return `<h3 style="margin:12px 0 4px">סיכום לפי מחלקה: ${esc(nm(D.A))}</h3><table class="tbl"><tr><th>מחלקה</th><th>יקר יותר</th><th>זול יותר</th></tr>${rows.map(([d,o])=>`<tr><td>${esc(d)}</td><td class="n">${o.exp}</td><td class="n">${R.rb?o.chp:'—'}</td></tr>`).join('')}</table><div class="note">הספירה כוללת רק מוצרים בפער של ₪${esc(D.gap)}+ מול ${esc(nm(D.B))}${R.rb?'':'. "זול יותר" זמין למנהל רשת בלבד'}</div>`}
 function pwSend(side){
   const D=PW.data,R=pwRows();if(!D||!R)return;const l=side?R.rb:R.ra,who=side?D.B:D.A,vs=side?D.A:D.B;if(!l||!l.length){toast('אין מוצרים לשליחה');return}
   const top=l.slice(0,10),t=`שלום, ב${nm(who)} יש מוצרים יקרים יותר מ${nm(vs)}. ${top.length} הפערים הגדולים${D.d?' (מחלקה '+D.d+')':''}:\n`+top.map((x,i)=>`${i+1}. ${x.name} (${x.code}) · ${nm(who)} ₪${(side?x.pb:x.pa).toFixed(2)} מול ${nm(vs)} ₪${(side?x.pa:x.pb).toFixed(2)} · פער ₪${x.gap.toFixed(2)}`).join('\n')+`\n(${D.mode==='reg'?'מחיר מדף':'כולל מבצעים'}${D.when?', מחירים מ-'+D.when:''})`;
@@ -957,7 +978,7 @@ function pwMissView(){
   const M=PW.miss,box=document.getElementById('pwmt');if(!M||!box)return;
   const q=(document.getElementById('pwmq')||{value:''}).value.trim().toLowerCase();
   const f=l=>q?l.filter(r=>(r.n||'').toLowerCase().includes(q)||String(r.c).includes(q)):l;
-  const tbl=(l,who)=>{const fl=f(l);return fl.length?`<table class="tbl"><tr><th>מוצר</th><th>ברקוד</th></tr>${fl.slice(0,100).map(r=>`<tr><td>${esc(r.n)}</td><td class="mono">${esc(r.c)}</td></tr>`).join('')}</table>${fl.length>100?`<div class="note">מוצגים 100 הראשונים מתוך ${fl.length}</div>`:''}`:`<div class="state">${q?'לא נמצא בחיפוש':'אין מוצרים שיש רק ב'+esc(nm(who))}</div>`};
+  const tbl=(l,who)=>{const fl=f(l);return fl.length?`<table class="tbl"><tr><th>מוצר</th><th>ברקוד</th></tr>${fl.slice(0,100).map(r=>`<tr><td>${esc(r.n)}</td><td class="mono">${esc(r.c)}${CPB(r.c)}</td></tr>`).join('')}</table>${fl.length>100?`<div class="note">מוצגים 100 הראשונים מתוך ${fl.length}</div>`:''}`:`<div class="state">${q?'לא נמצא בחיפוש':'אין מוצרים שיש רק ב'+esc(nm(who))}</div>`};
   const fa=f(M.oa),fb=f(M.ob);
   box.innerHTML=`<h3 style="margin:12px 0 4px">יש רק ב${esc(nm(M.A))} (${q?fa.length+' מתוך '+M.oa.length:M.oa.length})</h3>${tbl(M.oa,M.A)}
   <h3 style="margin:12px 0 4px">יש רק ב${esc(nm(M.B))} (${q?fb.length+' מתוך '+M.ob.length:M.ob.length})</h3>${tbl(M.ob,M.B)}`}
@@ -1018,7 +1039,7 @@ async function expLoad(){
   const me=MINE(),u=`/api/exp?me=${me}&vs=${EXP.vs}&minc=${EXP.c}&minp=${EXP.p}&sort=${EXP.sort}&q=${encodeURIComponent(EXP.q)}&mode=${MODE}&page=${EXP.page}`;
   let d;try{d=await jget(u)}catch(e){return noRpc()}
   if(SCR!=='exp')return;EXP.rows=EXP.rows.concat(d.rows||[]);EXP.total=d.total||0;
-  $('#xl').innerHTML=EXP.rows.map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>${EXP.vs?'':'הכי זול: '}${esc(nm(r.cheapest))} ${fmt(r.cheapest_price)}${EXP.vs?' · אצלי '+fmt(r.m):''}${EXP.vs?'':' · '+r.n_cheaper+' סניפים זולים ב־₪'+EXP.c+'+'}</small></span><span class="pr">${fmt(r.m)}</span><span class="df up">+${fmt(r.m-r.cheapest_price)}</span></div>`).join('')||'<div class="state">לא נמצאו מוצרים לפי הסינון</div>';
+  $('#xl').innerHTML=EXP.rows.map(r=>`<div class="rw" data-code="${esc(r.code)}" style="cursor:pointer"><span class="rk"></span><span class="nm"><b>${esc(r.name)}</b><small>${EXP.vs?'':'הכי זול: '}${esc(nm(r.cheapest))} ${fmt(r.cheapest_price)}${EXP.vs?' · אצלי '+fmt(r.m):''}${EXP.vs?'':' · '+r.n_cheaper+' סניפים זולים ב־₪'+EXP.c+'+'}</small>${CPB(r.code)}</span><span class="pr">${fmt(r.m)}</span><span class="df up">+${fmt(r.m-r.cheapest_price)}</span></div>`).join('')||'<div class="state">לא נמצאו מוצרים לפי הסינון</div>';
   $('#xm').innerHTML=(d.more?'<button class="chip" id="xmore">עוד תוצאות</button> ':'')+`<span class="mono">${EXP.rows.length} מתוך ${EXP.total}</span>`;
   $('#xact').innerHTML=EXP.rows.length&&MGR()?'<button class="chip add" id="xcart">🧺 הוסף לסל (עד 120)</button><button class="chip go" id="xxl">📊 Excel</button><button class="chip go" id="xwa">📲 וואטסאפ</button>':'';
   if($('#xmore'))$('#xmore').onclick=()=>{EXP.page++;expLoad()};
