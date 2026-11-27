@@ -63,7 +63,7 @@ Price history and price alerts: the two read-only functions return only current 
 - **צופה:** `VIEWER_PASSWORDS` = `{"022":"סיסמה"}`. צופה רואה חיפוש והשוואה, בלי סל, ייצוא ודוחות. במסך הכניסה בוחרים "מנהל סניף" או "צופה".
 
 ## הודעת כניסה
-- `public/notice.js`: חלון חובה בכניסה הראשונה (אישור והמשך). האישור נשמר ב-localStorage (`osher24.notice`) עד שמשנים את `NOTICE_V` בקובץ. נטען במסך הכניסה, באתר ובעמודים המשפטיים.
+- `public/notice.js`: חלון חובה שמוצג בכל טעינת עמוד (אישור והמשך). שום דבר לא נשמר בדפדפן.
 
 ## עמודים משפטיים וצד שלישי (27.11.2026)
 - `public/privacy.html`, `terms.html`, `accessibility.html`: נגישים גם לפני כניסה (ברשימת `PUBLIC` ב-`_middleware.js`). פרטי המפעיל והמייל מולאו בכל שלושת העמודים.
