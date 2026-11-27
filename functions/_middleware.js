@@ -100,7 +100,7 @@ async function handle(ctx) {
   const secretFor = role => (role === 'admin' ? admin : role.startsWith('w:') ? (wmap[role] && ov[wmap[role]].h ? 'h:' + ov[wmap[role]].h : '') : /^v\d+$/.test(role) ? vpw[role.slice(1)] : (ovOf(role) || pw[role])) || '';
   const url = new URL(request.url);
   if (url.pathname === '/api/health') return next(); // protected by its own HEALTH_KEY
-  if (PUBLIC.has(url.pathname)) return next();
+  if (PUBLIC.has(url.pathname) || url.pathname === '/vendor/heebo.css' || url.pathname.startsWith('/vendor/fonts/')) return next();
 
   if (url.pathname === '/login' && request.method === 'POST') {
     let mode = 'admin';
