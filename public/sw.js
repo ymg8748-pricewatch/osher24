@@ -1,6 +1,6 @@
 // Minimal service worker: lets the site install as an app and show the page shell when offline.
 // It never caches /api/* or login pages, so prices and sessions are always live.
-const CACHE = 'o24-shell-v1';
+const CACHE = 'o24-shell-v2';
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
