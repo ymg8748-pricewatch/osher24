@@ -81,32 +81,8 @@
   document.addEventListener('pointermove', tilt, { passive: true });
   document.addEventListener('pointerleave', function () { if (cur) { cur.style.removeProperty('--rx'); cur.style.removeProperty('--ry'); cur = null; } });
 
-  /* magnetic cursor */
-  var ring = document.createElement('div'), dot = document.createElement('div');
-  ring.id = 'fxc'; dot.id = 'fxd'; ring.setAttribute('aria-hidden', 'true'); dot.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(ring); document.body.appendChild(dot);
-  root.classList.add('fx-cur');
-  var mx = -100, my = -100, rx = -100, ry = -100, run = 0, mag = null;
-  var HOT = 'a,button,select,summary,[role=button],[data-code],.chip,.qt,label';
-  var MAG = '.chip,.qt,#scan,.tab,.go';
-  function loop() {
-    rx += (mx - rx) * .22; ry += (my - ry) * .22;
-    ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
-    dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
-    run = (Math.abs(mx - rx) > .3 || Math.abs(my - ry) > .3) ? requestAnimationFrame(loop) : 0;
-  }
-  document.addEventListener('pointermove', function (e) {
-    if (e.pointerType !== 'mouse') return;
-    mx = e.clientX; my = e.clientY; ring.classList.add('on'); dot.classList.add('on');
-    if (!run) run = requestAnimationFrame(loop);
-    var t = e.target.closest ? e.target : null, hot = t && t.closest(HOT);
-    ring.classList.toggle('h', !!hot);
-    var m = t && t.closest(MAG);
-    if (mag && mag !== m) { mag.style.translate = ''; mag = null; }
-    if (m) {
-      var r = m.getBoundingClientRect(), dx = (e.clientX - (r.left + r.width / 2)) * .18, dy = (e.clientY - (r.top + r.height / 2)) * .18;
-      m.style.translate = Math.max(-8, Math.min(8, dx)).toFixed(1) + 'px ' + Math.max(-6, Math.min(6, dy)).toFixed(1) + 'px'; mag = m;
-    }
-  }, { passive: true });
-  document.addEventListener('pointerleave', function () { ring.classList.remove('on'); dot.classList.remove('on'); if (mag) { mag.style.translate = ''; mag = null; } });
+  /* magnetic cursor removed 28.11: it hid the native cursor (cursor:none) and replaced it
+     with a tiny dot/ring - users on desktop reported the mouse 'does not work'.
+     Native cursor restored. Tilt, glass, scroll indicator and kinetic headings are unchanged. */
 })();
+
